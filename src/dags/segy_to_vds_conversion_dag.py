@@ -46,7 +46,8 @@ env_vars = {}
 args = ["--segy", segy_url, "--vds", vds_url]
 
 
-kubernetes_min_pod = KubernetesPodOperator(
+kubernetes_min_pod = kubernetes_pod_operator.KubernetesPodOperator(
+    dag=dag,
     # The ID specified for the task.
     task_id='pod-ex-minimum',
     # Name of task you want to run, used to generate Pod ID.
@@ -67,4 +68,5 @@ kubernetes_min_pod = KubernetesPodOperator(
     # project-id as the gcr.io images and the service account that Composer
     # uses has permission to access the Google Container Registry
     # (the default service account has permission)
-    image='gcr.io/gcp-runtimes/ubuntu_18_0_4')
+    image='gcr.io/gcp-runtimes/ubuntu_18_0_4'
+)
