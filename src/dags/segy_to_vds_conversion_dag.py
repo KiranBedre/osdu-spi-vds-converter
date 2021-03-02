@@ -15,7 +15,7 @@
 
 import airflow
 from airflow import DAG
-from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
+from airflow.contrib.operators import kubernetes_pod_operator
 from datetime import timedelta
 
 default_args = {
@@ -46,7 +46,7 @@ env_vars = {}
 args = ["--segy", segy_url, "--vds", vds_url]
 
 
-kubernetes_min_pod = kubernetes_pod_operator.KubernetesPodOperator(
+k8s_test = kubernetes_pod_operator.KubernetesPodOperator(
     dag=dag,
     # The ID specified for the task.
     task_id='pod-ex-minimum',
