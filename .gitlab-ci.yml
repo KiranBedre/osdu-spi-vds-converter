@@ -31,7 +31,7 @@ isort:
 osdu-gcp-deploy:
   stage: deploy
   script:
-    - gcloud auth activate-service-account --key-file $OSDU_GCP_DEPLOY_FILE
+    - gcloud auth activate-service-account --key-file=$OSDU_GCP_DEPLOY_FILE
     - cd src
     - gsutil -m rsync -d -R dags $OSDU_GCP_DEPL_TARGET/dags/segy_to_vds
   except:
