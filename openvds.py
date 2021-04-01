@@ -10,9 +10,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
-
-
 import airflow
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
@@ -72,6 +69,7 @@ docker_image = ""
 # please make sure you have onboarded the Docker image from OSDU Forum Registry to the deployment environment
 # or configure docker session login to OSDU Forum registry
 
+#This will be part of <execution_context>
 #{
 #"url_connection":"Region=us-east-1;AccessKeyId=XXX;SecretKey=XX;SessionToken=XXX",
 #"input_connection":"Region=us-east-1;AccessKeyId=XXX;SecretKey=XXX;SessionToken=XXX"
@@ -82,10 +80,10 @@ docker_image = ""
 
 
 
-input_connection = "{{ dag_run.conf['input_connection'] }}"
-url_connection = "{{ dag_run.conf['url_connection'] }}"
-url = "{{dag_run.conf['url']}}"
-segy_file="{{dag_run.conf['segy_file']}}"
+input_connection = "{{ dag_run.conf['execution_context']['input_connection'] }}"
+url_connection = "{{ dag_run.conf['execution_context']['url_connection'] }}"
+url = "{{dag_run.conf['execution_context']['url']}}"
+segy_file="{{dag_run.conf['execution_context']['segy_file']}}"
 
 openvds_converter = KubernetesPodOperator(
     namespace=NAMESPACE,
