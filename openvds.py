@@ -64,7 +64,7 @@ env_vars = {
 dag = DAG(DAG_NAME, default_args=default_args)
 kube_config_path = os.path.join(os.environ['AIRFLOW_HOME'], 'kube_config.yaml')
 
-docker_image = "888733619319.dkr.ecr.us-east-1.amazonaws.com/openvds:2.0-AWS"
+docker_image = ""
 #the docker image can be hard coded or using a airflow variable to specify
 # please make sure you have onboarded the Docker image from OSDU Forum Registry to the deployment environment
 # or configure docker session login to OSDU Forum registry
