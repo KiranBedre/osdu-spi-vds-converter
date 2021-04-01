@@ -2,7 +2,7 @@
 
 Airflow DAG for transformation from SEGY to OpenVDS
 
-###Registering a Workflow
+### Registering a Workflow
 ```
 curl --location --request POST 'https://<base_url>/api/workflow/v1/workflow' \
 --header 'Content-Type: application/json' \
@@ -32,7 +32,7 @@ Expected Output
 
 
 
-###Triggering Workflow
+### Triggering Workflow
 
 Configuring the input, url connection and target location, see the 
 
