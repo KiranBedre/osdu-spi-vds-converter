@@ -1,5 +1,6 @@
 #  Copyright 2020 Google LLC
 #  Copyright 2020 EPAM Systems
+#  Copyright 2020 Microsoft
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,12 +13,28 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+variables:
+  #segy-to-vds conversion
+  AZURE_CLIENT_ID: ${AZURE_PRINCIPAL_ID}
+  AZURE_CLIENT_SECRET: ${AZURE_PRINCIPAL_SECRET}
+  AZURE_AD_APP_RESOURCE_ID: ${AZURE_APP_ID}
+  AZURE_SERVICE: segy-to-vds-conversion
+  AZURE_DEPLOYMENTS_SUBDIR: deployments/scripts/azure
+  VDS_DAG: https://community.opengroup.org/osdu/platform/domain-data-mgmt-services/seismic/open-vds/container_registry/2137
 
 image: google/cloud-sdk:alpine
 
 stages:
   - linters
+  - containerize
   - deploy
+  - review
+  - build
+  - scan
+  - bootstrap
+  - integration
+  - attribution
+  - publish
 
 isort:
   image: johnybear/osdu-airflow:python36-2
@@ -27,6 +44,10 @@ isort:
     - python -m pip install setuptools isort
     - isort -c -v src/*/*.py || EXIT_CODE=$?
     - exit ${EXIT_CODE}
+  only:
+    variables:
+    - $AZURE == 'false'
+
 
 osdu-gcp-deploy:
   stage: deploy
@@ -37,3 +58,17 @@ osdu-gcp-deploy:
   except:
     - /^release\/*/
   when: manual
+  only:
+    variables:
+    - $AZURE == 'false'
+
+include: 
+  # pipeline logic
+  - project: "osdu/platform/ci-cd-pipelines"
+    file: "standard-setup.yml"
+
+  # azure containerize
+  - local: "/devops/azure/containerize-segy-to-vds.yml"
+
+  # azure deploy
+  - local: "/devops/azure/azure-segy-to-vds.yml"
