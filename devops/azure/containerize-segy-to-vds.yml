@@ -1,0 +1,22 @@
+azure_containerize:
+  image: danielscholl/azure-build-image
+  tags: ["osdu-medium"]
+  stage: containerize
+  variables:
+    DAG_IMAGE: ${VDS_DAG}:latest
+    DAG_TAG: vds_dag:${CI_COMMIT_SHA}
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - az login --service-principal -u $AZURE_PRINCIPAL_ID -p $AZURE_PRINCIPAL_SECRET --tenant $AZURE_TENANT_ID
+    - az acr login -n $AZURE_REGISTRY
+  script:
+    # Build Docker Image
+    - docker build -t $CI_REGISTRY_IMAGE/$DAG_TAG --file deployments/scripts/azure/Dockerfile  .
+    - docker push $CI_REGISTRY_IMAGE/$DAG_TAG
+
+    # Azure Container Registry
+    - docker tag $CI_REGISTRY_IMAGE/$DAG_TAG ${AZURE_REGISTRY}.azurecr.io/$DAG_TAG
+    - docker push ${AZURE_REGISTRY}.azurecr.io/$DAG_TAG
+  only:
+    variables:
+      - $AZURE == 'true'
