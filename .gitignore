@@ -34,3 +34,5 @@
 # ignore coverage.py
 htmlcov/*
 .coverage
+
+.env

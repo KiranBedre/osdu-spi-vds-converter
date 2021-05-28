@@ -14,12 +14,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 variables:
-  #segy-to-vds conversion
+  AZURE_SERVICE: segy-to-vds-conversion
+  AZURE_DEPLOYMENTS_SUBDIR: deployments/scripts/azure
   AZURE_CLIENT_ID: ${AZURE_PRINCIPAL_ID}
   AZURE_CLIENT_SECRET: ${AZURE_PRINCIPAL_SECRET}
   AZURE_AD_APP_RESOURCE_ID: ${AZURE_APP_ID}
-  AZURE_SERVICE: segy-to-vds-conversion
-  AZURE_DEPLOYMENTS_SUBDIR: deployments/scripts/azure
   VDS_DAG: https://community.opengroup.org/osdu/platform/domain-data-mgmt-services/seismic/open-vds/container_registry/2137
 
 image: google/cloud-sdk:alpine
@@ -62,13 +61,9 @@ osdu-gcp-deploy:
     variables:
     - $AZURE == 'false'
 
-include: 
+include:
   # pipeline logic
   - project: "osdu/platform/ci-cd-pipelines"
     file: "standard-setup.yml"
 
-  # azure containerize
-  - local: "/devops/azure/containerize-segy-to-vds.yml"
-
-  # azure deploy
-  - local: "/devops/azure/azure-segy-to-vds.yml"
+  - local: "/devops/azure/override-stages.yml"

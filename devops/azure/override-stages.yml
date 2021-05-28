@@ -1,0 +1,54 @@
+# Override the containerize stage so that we can build the dag load container as well.
+azure_containerize:
+  image: danielscholl/azure-build-image
+  tags: ['osdu-medium']
+  stage: containerize
+  variables:
+    DAG_TASK_IMAGE: ${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}:${CI_COMMIT_SHA}
+    DAG_LOAD_IMAGE: ${CI_PROJECT_NAME}-dag-${CI_COMMIT_REF_SLUG}:${CI_COMMIT_SHA}
+  before_script:
+    - echo -n $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    - az --version
+    - az login --service-principal -u $AZURE_PRINCIPAL_ID -p $AZURE_PRINCIPAL_SECRET --tenant $AZURE_TENANT_ID
+  script:
+    # Build Docker Image
+    - docker build -t $CI_REGISTRY_IMAGE/$DAG_LOAD_IMAGE --file deployments/scripts/azure/Dockerfile  .
+    - docker push $CI_REGISTRY_IMAGE/$DAG_LOAD_IMAGE
+
+    # Azure Container Registry
+    - az acr login -n $AZURE_REGISTRY
+    - docker tag $CI_REGISTRY_IMAGE/$DAG_LOAD_IMAGE ${AZURE_REGISTRY}.azurecr.io/$DAG_LOAD_IMAGE
+    - docker push ${AZURE_REGISTRY}.azurecr.io/$DAG_LOAD_IMAGE
+  only:
+    variables:
+      - $AZURE == 'true'
+
+
+azure_deploy:
+  stage: deploy
+  image: danielscholl/azure-build-image
+  needs: ["azure_containerize"]
+  tags: ['osdu-medium']
+  variables:
+    DAG_TASK_IMAGE: ${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}:${CI_COMMIT_SHA}
+    DAG_LOAD_IMAGE: ${CI_PROJECT_NAME}-dag-${CI_COMMIT_REF_SLUG}:${CI_COMMIT_SHA}
+  before_script:
+    - az login --service-principal -u $AZURE_PRINCIPAL_ID -p $AZURE_PRINCIPAL_SECRET --tenant $AZURE_TENANT_ID
+    - az aks get-credentials -g $AZURE_UNIQUE-rg -n $AZURE_UNIQUE-aks
+  script:
+    - |
+      cat > .env << EOF
+      DAG_TASK_IMAGE=${AZURE_REGISTRY}.azurecr.io/$DAG_TASK_IMAGE
+      SHARED_TENANT=$SHARED_TENANT
+      AZURE_TENANT_ID=$AZURE_TENANT_ID
+      AZURE_DNS_NAME=$AZURE_DNS_NAME
+      AZURE_AD_APP_RESOURCE_ID=$AZURE_AD_APP_RESOURCE_ID
+      AZURE_CLIENT_ID=$AZURE_CLIENT_ID
+      AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET
+      EOF
+
+      docker run --env-file .env $CI_REGISTRY_IMAGE/$DAG_LOAD_IMAGE
+
+  only:
+    variables:
+      - $AZURE == 'true'
