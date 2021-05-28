@@ -10,11 +10,11 @@ class RegisterDag:
         self.token = os.environ.get('BEARER_TOKEN')
         self.data_partition_id = os.environ.get('SHARED_TENANT')
         self.workflow_service_url = os.environ.get('WORKFLOW_URL')
-        self.docker_image = os.environ.get('DAG_DOCKER_IMAGE')
+        self.docker_image = os.environ.get('DAG_TASK_IMAGE')
         self.dns_host_name = os.environ.get('AZURE_DNS_NAME')
         self.namespace = os.environ.get('NAMESPACE')
         self.file_path = file_path
-        self.service_name = os.environ.get('SERVICE_NAME')
+        self.service_name = self.docker_image[self.docker_image.index("/") + 1: self.docker_image.index(":")]
         self.build_version = self.docker_image[self.docker_image.index(":") + 1:]
         self.dag_name = f"{self.service_name}-{self.build_version}"
         self.env_vars = {
@@ -39,7 +39,7 @@ class RegisterDag:
         print(f"service_name: {self.service_name}")
         print(f"build_version: {self.build_version}")
         print(f"dag_name: {self.dag_name}")
-       
+
     def register(self):
         dag = self.read_dag_and_replace_placeholders()
         self.register_dag(dag)
@@ -72,7 +72,7 @@ class RegisterDag:
         }
 
         response = requests.post(self.workflow_service_url, headers=headers, data=data)
-        if response.status_code == 200 or response.status_code == 409: #needs to be registered only once as per discussion with VDS team
+        if response.status_code == 200 or response.status_code == 409: #needs to be registered only once as per discussion with team
             workflow_id = response.json().get('workflowId')
             print("DAG registered with workflowId: {0}".format(workflow_id))
         else:
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     parser.add_argument('-f', type=str,
                         help='The path to the load python dag file.',
                         default=None)
-                        
+
     arguments = parser.parse_args()
 
     if arguments.f is not None:
