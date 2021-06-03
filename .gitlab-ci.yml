@@ -64,6 +64,7 @@ osdu-gcp-deploy:
 include:
   # pipeline logic
   - project: "osdu/platform/ci-cd-pipelines"
+    ref: 'release/0.9'
     file: "standard-setup.yml"
 
   - local: "/devops/azure/override-stages.yml"
