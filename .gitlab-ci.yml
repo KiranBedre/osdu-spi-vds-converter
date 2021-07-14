@@ -20,6 +20,11 @@ variables:
   AZURE_CLIENT_SECRET: ${AZURE_PRINCIPAL_SECRET}
   AZURE_AD_APP_RESOURCE_ID: ${AZURE_APP_ID}
   VDS_DAG: https://community.opengroup.org/osdu/platform/domain-data-mgmt-services/seismic/open-vds/container_registry/2137
+  OSDU_GCP_PROJECT: nice-etching-277309
+  OSDU_GCP_SERVICE: segy-to-vds-conversion
+  OSDU_GCP_VENDOR: gcp
+  OSDU_GCP_K8S_NODE_POOLS: pool-2
+  OSDU_GCP_SEISMIC_STORE_SERVICE_ENDPOINT: https://seismic-store-attcrcktoa-uc.a.run.app/api/v3
 
 image: google/cloud-sdk:alpine
 
@@ -48,12 +53,28 @@ isort:
       - $OSDU_GCP == 'true'
 
 
+.osdu-gcp-common-deploy: &osdu-gcp-common-deploy
+  - gcloud auth activate-service-account --key-file=$OSDU_GCP_DEPLOY_FILE
+  - pip install -r deployments/scripts/gcp/requirements.txt
+  - chmod +x ./deployments/scripts/gcp/bootstrap.sh && ./deployments/scripts/gcp/bootstrap.sh
+  - echo $DAG_DIRECTORY
+  - echo $OSDU_GCP_DEPL_TARGET/dags/segy_to_vds
+  - gsutil -m rsync -d -R src/dags $OSDU_GCP_DEPL_TARGET/dags/segy_to_vds
+
+
 osdu-gcp-deploy:
+  image: gcr.io/google.com/cloudsdktool/cloud-sdk
   stage: deploy
+  variables:
+    DAG_DIRECTORY: $CI_PROJECT_DIR/src/dags
+    K8S_NAMESPACE: default
+    K8S_NODE_POOLS: $OSDU_GCP_K8S_NODE_POOLS
+    SD_SVC_URL: $OSDU_GCP_SEISMIC_STORE_SERVICE_ENDPOINT # i.e https://<ssdms_host>/seistore-svc/api/v3
+    SEGY_VDS_DOCKER_IMAGE: "community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest"
+    GCP_DEPLOYMENTS_SUBDIR: deployments/scripts/gcp
+    GCP_DAG_DIRECTORY: $CI_PROJECT_DIR/src/dags
   script:
-    - gcloud auth activate-service-account --key-file=$OSDU_GCP_DEPLOY_FILE
-    - cd src
-    - gsutil -m rsync -d -R dags $OSDU_GCP_DEPL_TARGET/dags/segy_to_vds
+    - *osdu-gcp-common-deploy 
   except:
     - /^release\/*/
   when: manual
