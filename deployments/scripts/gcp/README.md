@@ -1,6 +1,9 @@
 ## GCP: DAG FILE RENDERING
 
 ```bash
+# Install requirements
+pip install Jinja2==2.10.1
+
 # Setup Variables
 export K8S_NAMESPACE="<your_k8s_namespace>"  # ie: default
 export SEGY_VDS_DOCKER_IMAGE="<image_tag>"

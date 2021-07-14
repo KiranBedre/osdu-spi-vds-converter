@@ -1,6 +1,6 @@
 import argparse
-import json
 import os
+from jinja2 import Environment, FileSystemLoader
 from typing import Dict, List
 
 
@@ -44,25 +44,29 @@ class DAGFileRenderer:
             "startup_timeout_seconds": os.getenv("GCP_VDS_INGESTION_STARTUP_TIMEOUT", default=300)
         }
 
-    def _populate_settings(self, file_data: str) -> str:
-        file_data = file_data.replace("DAG_NAME_PLACEHOLDER", self.dag_name)
-        file_data = file_data.replace(
-            "DOCKER_IMAGE_PLACEHOLDER", self.docker_image)
-        file_data = file_data.replace("K8S_NAMESPACE_PLACEHOLDER", f"{self.namespace}")
-        file_data = file_data.replace(f"K8S_POD_KWARGS_PLACEHOLDER",
-                                      json.dumps(self._prepare_operator_kwargs(), indent=4))
-        file_data = file_data.replace(
-            "SEISMIC_STORE_URL_PLACEHOLDER",
-            self.sd_svc_url
+    def _render_template(self, file) -> str:
+        env = Environment(
+            loader=FileSystemLoader(searchpath=os.getenv("GCP_DAG_DIRECTORY", default="src/dags")),
+            variable_start_string='{|', variable_end_string='|}',
         )
-        return file_data
+        template = env.get_template(os.path.basename(file.name))
+
+        params = {
+            "DAG_NAME": self.dag_name,
+            "DOCKER_IMAGE": self.docker_image,
+            "K8S_NAMESPACE": self.namespace,
+            "K8S_POD_KWARGS": self._prepare_operator_kwargs(),
+            "SEISMIC_STORE_URL": self.sd_svc_url,
+        }
+
+        return template.render(**params)
 
     def render(self, output_path=None):
         print(f"Start {self.file_path} file rendering")
 
         output_path = output_path or self.file_path
         with open(self.file_path, "r") as f:
-            rendered_file_data = self._populate_settings(f.read())
+            rendered_file_data = self._render_template(f)
 
         with open(output_path, "w") as f:
             f.write(rendered_file_data)

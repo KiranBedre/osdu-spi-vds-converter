@@ -15,12 +15,12 @@
 
 """DAG for transformation SEGY file stored Seismic Store to VDS files in Seismic Store."""
 
-import json
 from datetime import timedelta
 
 import airflow
 from airflow import DAG
-from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
+from airflow.contrib.operators.kubernetes_pod_operator import \
+    KubernetesPodOperator
 
 default_args = {
     "start_date": airflow.utils.dates.days_ago(0),
@@ -29,16 +29,13 @@ default_args = {
     "trigger_rule": "none_failed",
 }
 
-dag_name = "DAG_NAME_PLACEHOLDER"
-docker_image = "DOCKER_IMAGE_PLACEHOLDER"
-k8s_namespace = "K8S_NAMESPACE_PLACEHOLDER"
-try:
-    K8S_POD_KWARGS = json.loads("""
-        K8S_POD_KWARGS_PLACEHOLDER
-    """)
-except json.JSONDecodeError:
+dag_name = "{| DAG_NAME |}"
+docker_image = "{| DOCKER_IMAGE |}"
+k8s_namespace = "{| K8S_NAMESPACE |}"
+K8S_POD_KWARGS = {| K8S_POD_KWARGS |}
+if not K8S_POD_KWARGS:
     K8S_POD_KWARGS = {}
-seismic_store_url = "SEISMIC_STORE_URL_PLACEHOLDER"
+seismic_store_url = "{| SEISMIC_STORE_URL |}"
 
 persistent_id = "{{ dag_run.conf['execution_context']['persistent_id'] }}"
 vds_url = "{{ dag_run.conf['execution_context']['vds_url'] }}"
