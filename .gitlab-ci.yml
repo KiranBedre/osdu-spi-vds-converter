@@ -36,7 +36,7 @@ stages:
   - publish
 
 isort:
-  image: johnybear/osdu-airflow:python36-2
+  image: python:3.6-slim
   allow_failure: true
   stage: linters
   script:
@@ -45,7 +45,7 @@ isort:
     - exit ${EXIT_CODE}
   only:
     variables:
-    - $AZURE == 'false'
+      - $OSDU_GCP == 'true'
 
 
 osdu-gcp-deploy:
@@ -59,7 +59,7 @@ osdu-gcp-deploy:
   when: manual
   only:
     variables:
-    - $AZURE == 'false'
+      - $OSDU_GCP == 'true'
 
 include:
   # pipeline logic
