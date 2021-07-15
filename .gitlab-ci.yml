@@ -59,7 +59,7 @@ isort:
   - chmod +x ./deployments/scripts/gcp/bootstrap.sh && ./deployments/scripts/gcp/bootstrap.sh
   - echo $DAG_DIRECTORY
   - echo $OSDU_GCP_DEPL_TARGET/dags/segy_to_vds
-  - gsutil -m rsync -d -R src/dags $OSDU_GCP_DEPL_TARGET/dags/segy_to_vds
+  - gsutil -m rsync -R -x '(?!^segy_to_vds_ssdms_conversion_dag.py$)' src/dags $OSDU_GCP_DEPL_TARGET/dags/segy_to_vds
 
 
 osdu-gcp-deploy:
