@@ -21,6 +21,8 @@ import airflow
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import \
     KubernetesPodOperator
+from libs.airflow.backward_compatibility.default_args import \
+    update_default_args
 
 default_args = {
     "start_date": airflow.utils.dates.days_ago(0),
@@ -28,6 +30,8 @@ default_args = {
     "retry_delay": timedelta(seconds=30),
     "trigger_rule": "none_failed",
 }
+
+default_args = update_default_args(default_args)
 
 dag_name = "{| DAG_NAME |}"
 docker_image = "{| DOCKER_IMAGE |}"
