@@ -17,6 +17,7 @@ class RegisterDag:
         self.service_name = self.docker_image[self.docker_image.index("/") + 1: self.docker_image.index(":")]
         self.build_version = self.docker_image[self.docker_image.index(":") + 1:]
         self.dag_name = f"{self.service_name}-{self.build_version}"
+        self.dag_name = f"segy-to-zgy-conversion-{self.build_version}"
         self.env_vars = {
             "storage_service_endpoint": f"https://{self.dns_host_name}/api/storage/v2",
             "schema_service_endpoint": f"https://{self.dns_host_name}/api/schema-service/v1",
