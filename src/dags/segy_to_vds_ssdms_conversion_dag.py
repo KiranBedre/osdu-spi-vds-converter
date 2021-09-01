@@ -21,7 +21,7 @@ import airflow
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import \
     KubernetesPodOperator
-from libs.airflow.backward_compatibility.default_args import \
+from osdu_airflow.backward_compatibility.default_args import \
     update_default_args
 
 default_args = {
