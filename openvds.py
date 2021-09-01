@@ -58,7 +58,8 @@ env_vars = {
     "search_service_endpoint": f"{os.environ['API_BASE_URL']}/api/search/v2",
     "partition_service_endpoint": f"{os.environ['API_BASE_URL']}/api/partition/v1",
     "unit_service_endpoint": f"{os.environ['API_BASE_URL']}/api/unit/v2/unit/symbol",
-    "dataset_service_endpoint": f"{os.environ['API_BASE_URL']}/api/dataset/v1"
+    "dataset_service_endpoint": f"{os.environ['API_BASE_URL']}/api/dataset/v1",
+    "AWS_REGION": os.environ.get("AWS_DEFAULT_REGION")
 }
 
 dag = DAG(DAG_NAME, default_args=default_args)
