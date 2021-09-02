@@ -4,21 +4,25 @@ azure_containerize:
   tags: ['osdu-medium']
   stage: containerize
   variables:
-    DAG_TASK_IMAGE: ${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}:${CI_COMMIT_SHA}
     DAG_LOAD_IMAGE: ${CI_PROJECT_NAME}-dag-${CI_COMMIT_REF_SLUG}:${CI_COMMIT_SHA}
+    SRC_DAG_TASK_IMAGE: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest
   before_script:
     - echo -n $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
     - az --version
     - az login --service-principal -u $AZURE_PRINCIPAL_ID -p $AZURE_PRINCIPAL_SECRET --tenant $AZURE_TENANT_ID
   script:
-    # Build Docker Image
+    # Build Docker Image For Registeration
     - docker build -t $CI_REGISTRY_IMAGE/$DAG_LOAD_IMAGE --file deployments/scripts/azure/Dockerfile  .
-    - docker push $CI_REGISTRY_IMAGE/$DAG_LOAD_IMAGE
 
-    # Azure Container Registry
+    # conversion image 
+    - docker pull $SRC_DAG_TASK_IMAGE
+    - docker tag $SRC_DAG_TASK_IMAGE ${AZURE_REGISTRY}.azurecr.io/vds_dag:latest
+    
+    # Push Image to Azure Container Registry
     - az acr login -n $AZURE_REGISTRY
     - docker tag $CI_REGISTRY_IMAGE/$DAG_LOAD_IMAGE ${AZURE_REGISTRY}.azurecr.io/$DAG_LOAD_IMAGE
     - docker push ${AZURE_REGISTRY}.azurecr.io/$DAG_LOAD_IMAGE
+    - docker push ${AZURE_REGISTRY}.azurecr.io/vds_dag:latest
   only:
     variables:
       - $AZURE == 'true'
@@ -30,7 +34,7 @@ azure_deploy:
   needs: ["azure_containerize"]
   tags: ['osdu-medium']
   variables:
-    DAG_TASK_IMAGE: ${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}:${CI_COMMIT_SHA}
+    DAG_TASK_IMAGE: vds_dag:latest
     DAG_LOAD_IMAGE: ${CI_PROJECT_NAME}-dag-${CI_COMMIT_REF_SLUG}:${CI_COMMIT_SHA}
   before_script:
     - az login --service-principal -u $AZURE_PRINCIPAL_ID -p $AZURE_PRINCIPAL_SECRET --tenant $AZURE_TENANT_ID
@@ -47,7 +51,7 @@ azure_deploy:
       AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET
       EOF
 
-      docker run --env-file .env $CI_REGISTRY_IMAGE/$DAG_LOAD_IMAGE
+      docker run --env-file .env ${AZURE_REGISTRY}.azurecr.io/$DAG_LOAD_IMAGE
 
   only:
     variables:
