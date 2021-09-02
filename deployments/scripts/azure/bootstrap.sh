@@ -33,14 +33,18 @@ fi
 export SHARED_TENANT
 
 if [ -z $DAG_TASK_IMAGE ]; then
-  DAG_TASK_IMAGE=${AZURE_REGISTRY}.azurecr.io/${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}:latest
+  DAG_TASK_IMAGE=${AZURE_REGISTRY}.azurecr.io/vds_dag:latest
 fi
-export DAG_TASK_IMAGE
+
+
+export DAG_TASK_IMAGE #actual conversion
+#registeration: DAG_LOAD_IMAGE
 
 echo "AZURE_DNS_NAME: $AZURE_DNS_NAME"
 echo "WORKFLOW_URL: $WORKFLOW_URL"
 echo "SHARED_TENANT: $SHARED_TENANT"
 echo "DAG_TASK_IMAGE: $DAG_TASK_IMAGE"
+
 
 printf "\n"
 echo "Execute Python Script Token.py";
@@ -55,7 +59,7 @@ printf "\n"
 echo "Execute Python Script register_dag.py";
 echo "------------------------------------";
 
-python $AZURE_DEPLOYMENTS_SUBDIR/register_dag.py -f $DAG_DIRECTORY/openvds.py
+python $AZURE_DEPLOYMENTS_SUBDIR/register_dag.py -f $DAG_DIRECTORY/openvds_azure.py
 
 if test $? = '1'; then
 printf "\n"

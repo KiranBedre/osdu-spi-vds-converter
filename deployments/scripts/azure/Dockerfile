@@ -31,7 +31,7 @@ ADD deployments/scripts/azure/bootstrap.sh scripts/
 RUN chmod +x scripts/bootstrap.sh
 
 # Add DAGs
-ADD /openvds.py /openvds.py
+ADD /openvds_azure.py /openvds_azure.py
 
 # Execute as non root user.
 USER osdu
