@@ -2,6 +2,18 @@
 
 Airflow DAG for transformation from SEGY to OpenVDS
 
+
+### Requirements
+The [Airflow DAG](/src/dags/segy_to_vds_ssdms_conversion_dag.py) has dependencies from [osdu-airflow-lib](https://community.opengroup.org/osdu/platform/data-flow/ingestion/osdu-airflow-lib) package for common operators and backward compatibility.
+
+
+Install it in Airflow Environment:
+
+```shell
+pip install 'osdu-airflow' --extra-index-url=https://community.opengroup.org/api/v4/projects/668/packages/pypi/simple
+```
+
+
 ### Registering a Workflow
 ```
 curl --location --request POST 'https://<base_url>/api/workflow/v1/workflow' \
