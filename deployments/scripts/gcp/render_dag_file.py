@@ -19,7 +19,7 @@ class DAGFileRenderer:
 
     def _get_resources(self):
         return {
-            "request_memory": os.getenv("GCP_VDS_INGESTION_REQUEST_MEMORY", default="4Gi"),
+            "request_memory": os.getenv("GCP_VDS_INGESTION_REQUEST_MEMORY", default="2Gi"),
             "request_cpu": os.getenv("GCP_VDS_INGESTION_REQUEST_CPU", default="200m"),
             "limit_memory": os.getenv("GCP_VDS_INGESTION_LIMIT_MEMORY", default="8Gi"),
             "limit_cpu": os.getenv("GCP_VDS_INGESTION_LIMIT_CPU", default="1000m")

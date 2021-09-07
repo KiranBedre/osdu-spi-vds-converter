@@ -23,7 +23,7 @@ variables:
   OSDU_GCP_PROJECT: nice-etching-277309
   OSDU_GCP_SERVICE: segy-to-vds-conversion
   OSDU_GCP_VENDOR: gcp
-  OSDU_GCP_K8S_NODE_POOLS: pool-2
+  OSDU_GCP_K8S_NODE_POOLS: default-pool,pool-1,pool-2
   OSDU_GCP_SEISMIC_STORE_SERVICE_ENDPOINT: https://seismic-store-attcrcktoa-uc.a.run.app/api/v3
 
 image: google/cloud-sdk:alpine
