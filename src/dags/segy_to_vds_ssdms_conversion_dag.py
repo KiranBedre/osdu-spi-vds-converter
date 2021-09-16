@@ -23,6 +23,7 @@ from airflow.contrib.operators.kubernetes_pod_operator import \
     KubernetesPodOperator
 from osdu_airflow.backward_compatibility.default_args import \
     update_default_args
+from osdu_airflow.operators.update_status import UpdateStatusOperator
 
 default_args = {
     "start_date": airflow.utils.dates.days_ago(0),
@@ -55,6 +56,10 @@ dag = DAG(
 )
 
 with dag:
+    update_status_running = UpdateStatusOperator(
+        task_id="update_status_running",
+    )
+
     segy_to_vds = KubernetesPodOperator(
         task_id='segy_to_vds_ssdms_conversion',
         name='segy_vds_conversion',
@@ -76,4 +81,9 @@ with dag:
         **K8S_POD_KWARGS
     )
 
-segy_to_vds  # pylint: disable=pointless-statement
+    update_status_finished = UpdateStatusOperator(
+        task_id="update_status_finished",
+        trigger_rule="all_done"
+    )
+
+update_status_running >> segy_to_vds >> update_status_finished # pylint: disable=pointless-statement
