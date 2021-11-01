@@ -22,7 +22,7 @@ GROUP=$(az group list --query "[?contains(name, 'cr${UNIQUE}')].name" -otsv)
 ENV_VAULT=$(az keyvault list --resource-group $GROUP --query [].name -otsv)
 
 cat > .env << EOF
-DAG_TASK_IMAGE=${ACR_REGISTRY}/$DAG_NAME:$TAG
+DAG_TASK_IMAGE=$DAG_TASK_IMAGE:$TAG
 SHARED_TENANT=$DATA_PARTITION
 AZURE_TENANT_ID=$AZURE_TENANT_ID
 AZURE_DNS_NAME=$AZURE_DNS_NAME
