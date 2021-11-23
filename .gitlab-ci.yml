@@ -21,67 +21,35 @@ variables:
   AZURE_CLIENT_SECRET: ${AZURE_PRINCIPAL_SECRET}
   AZURE_AD_APP_RESOURCE_ID: ${AZURE_APP_ID}
   VDS_DAG: https://community.opengroup.org/osdu/platform/domain-data-mgmt-services/seismic/open-vds/container_registry/2137
-  OSDU_GCP_PROJECT: nice-etching-277309
+
+  OSDU_GCP_COMMUNITY_BUCKET: gs://us-central1-osdu-airflow-f361a286-bucket
+  OSDU_GCP_PRESHIP_BUCKET: gs://us-central1-airflow-v2-36b0ff41-bucket
+  OSDU_GCP_COMMUNITY_PROJECT: nice-etching-277309
+  OSDU_GCP_PRE_SHIP_PROJECT: 	osdu-service-prod
   OSDU_GCP_SERVICE: segy-to-vds-conversion
   OSDU_GCP_VENDOR: gcp
   OSDU_GCP_K8S_NODE_POOLS: default-pool,pool-1,pool-2
   OSDU_GCP_SEISMIC_STORE_SERVICE_ENDPOINT: https://seismic-store-attcrcktoa-uc.a.run.app/api/v3
   SEGY_VDS_DOCKER_IMAGE: "community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest"
+  OSDU_GCP_OUTPUT_DAG_DIR: bootstrapped_dag
+  OSDU_GCP_SEISMIC_STORE_SERVICE_COMMUNITY_ENDPOINT: https://com.osdu.club/api/seismic/v3
+  OSDU_GCP_SEISMIC_STORE_SERVICE_PRE_SHIP_ENDPOINT: https://preship.osdu.club/api/seismic/v3
+
 
 image: google/cloud-sdk:alpine
 
 stages:
+  - review
   - linters
   - containerize
+  - bootstrap_dag
   - deploy
-  - review
   - build
   - scan
   - bootstrap
   - integration
   - attribution
   - publish
-
-isort:
-  image: python:3.6-slim
-  allow_failure: true
-  stage: linters
-  script:
-    - python -m pip install setuptools isort
-    - isort -c -v src/*/*.py || EXIT_CODE=$?
-    - exit ${EXIT_CODE}
-  only:
-    variables:
-      - $OSDU_GCP == 'true'
-
-
-.osdu-gcp-common-deploy: &osdu-gcp-common-deploy
-  - gcloud auth activate-service-account --key-file=$OSDU_GCP_DEPLOY_FILE
-  - pip install -r deployments/scripts/gcp/requirements.txt
-  - chmod +x ./deployments/scripts/gcp/bootstrap.sh && ./deployments/scripts/gcp/bootstrap.sh
-  - echo $DAG_DIRECTORY
-  - echo $OSDU_GCP_DEPL_TARGET/dags/segy_to_vds
-  - gsutil -m rsync -R -x '(?!^segy_to_vds_ssdms_conversion_dag.py$)' src/dags $OSDU_GCP_DEPL_TARGET/dags/segy_to_vds
-
-
-osdu-gcp-deploy:
-  image: gcr.io/google.com/cloudsdktool/cloud-sdk
-  stage: deploy
-  variables:
-    DAG_DIRECTORY: $CI_PROJECT_DIR/src/dags
-    K8S_NAMESPACE: default
-    K8S_NODE_POOLS: $OSDU_GCP_K8S_NODE_POOLS
-    SD_SVC_URL: $OSDU_GCP_SEISMIC_STORE_SERVICE_ENDPOINT # i.e https://<ssdms_host>/seistore-svc/api/v3
-    GCP_DEPLOYMENTS_SUBDIR: deployments/scripts/gcp
-    GCP_DAG_DIRECTORY: $CI_PROJECT_DIR/src/dags
-  script:
-    - *osdu-gcp-common-deploy 
-  except:
-    - /^release\/*/
-  when: manual
-  only:
-    variables:
-      - $OSDU_GCP == 'true'
 
 include:
   # pipeline logic
@@ -91,3 +59,9 @@ include:
   - local: "/devops/azure/override-stages.yml"
   # in case of any changes at project directory structure please make adjustments to Deployment Framework scripts
   - local: "/deployments/scripts/gcp/bootstrap_segy_to_vds.yaml"
+
+  - project: "osdu/platform/ci-cd-pipelines"
+    ref: "master"
+    file: "cloud-providers/osdu-gcp-dag.yaml"
+
+  - local: "/devops/gcp/override-stages.yml"
