@@ -1,5 +1,5 @@
-#  Copyright 2020 Google LLC
-#  Copyright 2020 EPAM Systems
+#  Copyright 2021 Google LLC
+#  Copyright 2021 EPAM Systems
 #  Copyright 2020 Microsoft
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+
 variables:
   AZURE_SERVICE: segy-to-vds-conversion
   AZURE_DEPLOYMENTS_SUBDIR: deployments/scripts/azure
@@ -25,6 +26,7 @@ variables:
   OSDU_GCP_VENDOR: gcp
   OSDU_GCP_K8S_NODE_POOLS: default-pool,pool-1,pool-2
   OSDU_GCP_SEISMIC_STORE_SERVICE_ENDPOINT: https://seismic-store-attcrcktoa-uc.a.run.app/api/v3
+  SEGY_VDS_DOCKER_IMAGE: "community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest"
 
 image: google/cloud-sdk:alpine
 
@@ -70,7 +72,6 @@ osdu-gcp-deploy:
     K8S_NAMESPACE: default
     K8S_NODE_POOLS: $OSDU_GCP_K8S_NODE_POOLS
     SD_SVC_URL: $OSDU_GCP_SEISMIC_STORE_SERVICE_ENDPOINT # i.e https://<ssdms_host>/seistore-svc/api/v3
-    SEGY_VDS_DOCKER_IMAGE: "community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest"
     GCP_DEPLOYMENTS_SUBDIR: deployments/scripts/gcp
     GCP_DAG_DIRECTORY: $CI_PROJECT_DIR/src/dags
   script:
@@ -88,3 +89,5 @@ include:
     file: "standard-setup.yml"
 
   - local: "/devops/azure/override-stages.yml"
+  # in case of any changes at project directory structure please make adjustments to Deployment Framework scripts
+  - local: "/deployments/scripts/gcp/bootstrap_segy_to_vds.yaml"
