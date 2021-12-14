@@ -187,9 +187,15 @@ python sdutil unlock sd://<tenant>/<subproject>/<path>/<file_name>  --idtoken=$I
 
 `sd://<tenant>/<subproject>/<some_path>/<file_name>` is URI to address your dataset. With this URI you will work in the next steps.
 
+### Ingest the WorkProduct of the Segy-file
+
+Ingest the corresponding Manifest with using Manifest-based-ingestion. The `sd-path` must be set as a value of `data.DatasetsProperties.FileCollectionPath` of the dataset--FileCollection.SEGY record. 
+
+Then, you can use the Ids of the File and WorkProduct records for the further conversion.
+
 ### Start Segy -> OpenVDS conversion workflow
 
-After you uploaded the file on Seismic Store, you can start the conversion workflow:
+After you uploaded the file on Seismic Store and created the metadata of the file, you can start the conversion workflow:
 
 ```shell
 curl --location --request POST '<workflow_host>/v1/workflow/Segy_to_vds_conversion_sdms/workflowRun' \
@@ -205,9 +211,12 @@ curl --location --request POST '<workflow_host>/v1/workflow/Segy_to_vds_conversi
         "vds_url": "sd://<tenant>/<subproject>/<path>",
         "persistent_id": "<unique name of vds conversion>",
         "id_token": <id_token>
-        "segy_url": "sd://<tenant>/<subproject>/<path>/<segy_name>"
+        "work_product_id": "<work-product-id>"
+        "file_record_id": <vds-file-record-id>
     }
 ```
+
+After the conversion, a new OpenVDS FileRecord will be created with the `sd-path` to the OpenVDS collection in it. Also, the SeismicTraceData record will be updated with `Artefacts` field with the reference to the OpenVDS file.
 
 The following fields:
 
@@ -215,11 +224,13 @@ The following fields:
 
 - `persistent_id` - unique ID of the dataset, can be considered the dataset's name;
 
-- `segy_url` - Segy-file Seismic Store URI.
+- `file_record_id` - Segy-file metadata with Seismic Store URI.
+
+- `work_product_id` - Work product id with WPC that have references to the FIle Record
 
 The full Seismic Store URI of OpenVDS dataset will look like `sd://<tenant>/<subproject>/<path>/<persistent_id>`.
 
-To verify that OpenVDS was created successfully:
+To verify that OpenVDS collection was created successfully:
 
 ```shell
 python sdutil stat sd://<tenant>/<subproject>/<path>/<persistent_id> --idtoken=$ID_TOKEN
