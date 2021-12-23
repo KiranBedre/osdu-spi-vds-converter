@@ -13,13 +13,13 @@ osdu_gcp_bootstrap_dag_community:
   variables:
     << : *osdu_gcp_common_bootstrap_variables
     SD_SVC_URL: $OSDU_GCP_SEISMIC_STORE_SERVICE_COMMUNITY_ENDPOINT # i.e https://<ssdms_host>/seistore-svc/api/v3
-    SEGY_VDS_DOCKER_IMAGE: $SEGY_VDS_DOCKER_IMAGE
+    SEGY_VDS_DOCKER_IMAGE: "community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest"
 
 osdu_gcp_bootstrap_dag_pre_ship:
   stage: bootstrap_dag
   variables:
     << : *osdu_gcp_common_bootstrap_variables
-    SD_SVC_URL: $OSDU_GCP_SEISMIC_STORE_SERVICE_COMMUNITY_ENDPOINT # i.e https://<ssdms_host>/seistore-svc/api/v3
+    SD_SVC_URL: $OSDU_GCP_SEISMIC_STORE_SERVICE_PRE_SHIP_ENDPOINT # i.e https://<ssdms_host>/seistore-svc/api/v3
     SEGY_VDS_DOCKER_IMAGE: $SEGY_VDS_DOCKER_IMAGE
 
 osdu_gcp_deploy_composer_community:

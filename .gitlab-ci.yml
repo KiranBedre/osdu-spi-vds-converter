@@ -32,8 +32,8 @@ variables:
   OSDU_GCP_SEISMIC_STORE_SERVICE_ENDPOINT: https://seismic-store-attcrcktoa-uc.a.run.app/api/v3
   SEGY_VDS_DOCKER_IMAGE: "community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest"
   OSDU_GCP_OUTPUT_DAG_DIR: bootstrapped_dag
-  OSDU_GCP_SEISMIC_STORE_SERVICE_COMMUNITY_ENDPOINT: https://com.osdu.club/api/seismic/v3
-  OSDU_GCP_SEISMIC_STORE_SERVICE_PRE_SHIP_ENDPOINT: https://preship.osdu.club/api/seismic/v3
+  OSDU_GCP_SEISMIC_STORE_SERVICE_COMMUNITY_ENDPOINT: https://community.gcp.gnrg-osdu.projects.epam.com/api/seismic-store/v3
+  OSDU_GCP_SEISMIC_STORE_SERVICE_PRE_SHIP_ENDPOINT: https://preship.osdu.club/api/seismic-store/v3
 
 
 image: google/cloud-sdk:alpine
