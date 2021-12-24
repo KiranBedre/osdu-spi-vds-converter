@@ -42,9 +42,8 @@ if [ -z $SEGY_VDS_DOCKER_IMAGE ]; then
   echo 'ERROR: SEGY_VDS_DOCKER_IMAGE not provided'
   usage;
 else
-  SEGY_VDS_DOCKER_IMAGE=${SEGY_VDS_DOCKER_IMAGE}
+  export SEGY_VDS_DOCKER_IMAGE=$SEGY_VDS_DOCKER_IMAGE
 fi
-export SEGY_VDS_DOCKER_IMAGE
 
 
 printf "\n"
