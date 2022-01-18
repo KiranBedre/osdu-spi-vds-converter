@@ -1,8 +1,6 @@
 .osdu_gcp_common_bootstrap_variables: &osdu_gcp_common_bootstrap_variables
   GCP_DAG_DIRECTORY: $CI_PROJECT_DIR/src/dags
   GCP_DEPLOYMENTS_SUBDIR: deployments/scripts/gcp
-  K8S_NAMESPACE: default
-  K8S_NODE_POOLS: $OSDU_GCP_K8S_NODE_POOLS
   OSDU_GCP_BOOTSTRAP_REQUIREMENTS: deployments/scripts/gcp/requirements.txt
   OSDU_GCP_BOOTSTRAP_SCRIPT: deployments/scripts/gcp/bootstrap.sh
 
@@ -12,15 +10,17 @@ osdu_gcp_bootstrap_dag_community:
   stage: bootstrap_dag
   variables:
     << : *osdu_gcp_common_bootstrap_variables
-    SD_SVC_URL: $OSDU_GCP_SEISMIC_STORE_SERVICE_COMMUNITY_ENDPOINT # i.e https://<ssdms_host>/seistore-svc/api/v3
-    SEGY_VDS_DOCKER_IMAGE: "community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest"
 
 osdu_gcp_bootstrap_dag_pre_ship:
   stage: bootstrap_dag
   variables:
     << : *osdu_gcp_common_bootstrap_variables
-    SD_SVC_URL: $OSDU_GCP_SEISMIC_STORE_SERVICE_PRE_SHIP_ENDPOINT # i.e https://<ssdms_host>/seistore-svc/api/v3
-    SEGY_VDS_DOCKER_IMAGE: $SEGY_VDS_DOCKER_IMAGE
+  
+osdu_gcp_publish_dag:
+  stage: publish_dag
+  variables:
+    BOOTSTRAPPED_DAG_PATH: ${OSDU_GCP_OUTPUT_DAG_DIR}/segy_to_vds_ssdms_conversion_dag.py
+    DAG_FILE: segy_to_vds_ssdms_conversion_dag.py
 
 osdu_gcp_deploy_composer_community:
   stage: deploy
