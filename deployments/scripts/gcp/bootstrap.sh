@@ -16,36 +16,6 @@ echo "------------------------------------";
 echo "BOOTSTRAP -- START";
 echo "------------------------------------";
 
-
-if [ -z $K8S_NAMESPACE ]; then
-  echo 'ERROR: K8S_NAMESPASE not provided'
-  usage;
-else
-  export NAMESPACE=$K8S_NAMESPACE
-fi
-
-if [ -z $K8S_NODE_POOLS ]; then
-  echo 'WARNING: K8S_NODE_POOLS not provided. Will be used default node pool'
-  export K8S_NODE_POOLS=default
-else
-  export K8S_NODE_POOLS=$K8S_NODE_POOLS
-fi
-
-if [ -z $SD_SVC_URL ]; then
-  echo 'ERROR: SD_SVC_URL not provided'
-  usage;
-else
-  export SD_SVC_URL=$SD_SVC_URL
-fi
-
-if [ -z $SEGY_VDS_DOCKER_IMAGE ]; then
-  echo 'ERROR: SEGY_VDS_DOCKER_IMAGE not provided'
-  usage;
-else
-  export SEGY_VDS_DOCKER_IMAGE=$SEGY_VDS_DOCKER_IMAGE
-fi
-
-
 printf "\n"
 echo "SETTING POPULATION TO THE DAG FILE";
 echo "------------------------------------";

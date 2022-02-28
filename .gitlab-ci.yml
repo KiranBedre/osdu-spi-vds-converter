@@ -43,6 +43,7 @@ stages:
   - linters
   - containerize
   - bootstrap_dag
+  - publish_dag
   - deploy
   - build
   - scan
