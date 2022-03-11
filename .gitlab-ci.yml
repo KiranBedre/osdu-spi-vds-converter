@@ -20,7 +20,7 @@ variables:
   AZURE_CLIENT_ID: ${AZURE_PRINCIPAL_ID}
   AZURE_CLIENT_SECRET: ${AZURE_PRINCIPAL_SECRET}
   AZURE_AD_APP_RESOURCE_ID: ${AZURE_APP_ID}
-  VDS_DAG: https://community.opengroup.org/osdu/platform/domain-data-mgmt-services/seismic/open-vds/container_registry/2137
+
 
   OSDU_GCP_COMMUNITY_BUCKET: gs://us-central1-osdu-airflow-f361a286-bucket
   OSDU_GCP_PRESHIP_BUCKET: gs://us-central1-airflow-v2-36b0ff41-bucket
@@ -55,6 +55,7 @@ stages:
 include:
   # pipeline logic
   - project: "osdu/platform/ci-cd-pipelines"
+    ref: "master"
     file: "standard-setup.yml"
 
   - local: "/devops/azure/override-stages.yml"

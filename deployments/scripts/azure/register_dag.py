@@ -2,6 +2,7 @@ import json
 import requests
 import os
 import argparse
+from jinja2 import Environment, FileSystemLoader
 
 
 class RegisterDag:
@@ -40,6 +41,25 @@ class RegisterDag:
         print(f"service_name: {self.service_name}")
         print(f"build_version: {self.build_version}")
         print(f"dag_name: {self.dag_name}")
+       
+
+    def _render_template(self, file) -> str:
+        env = Environment(
+            loader=FileSystemLoader(searchpath=os.getenv("DAG_DIRECTORY", default="airflow/workflow-svc-v2")),
+            variable_start_string='{|', variable_end_string='|}',
+        )
+        template = env.get_template(os.path.basename(file.name))
+
+        params = {
+            "DAG_NAME": self.dag_name,
+            "DOCKER_IMAGE": self.docker_image,
+            "DNS_HOST": self.dns_host_name,
+            "NAMESPACE": self.namespace,
+            "ENV_VARS": json.dumps(self.env_vars, indent=4),
+            "K8S_POD_KWARGS": None,
+        }
+
+        return template.render(**params)
 
     def register(self):
         dag = self.read_dag_and_replace_placeholders()
@@ -47,20 +67,14 @@ class RegisterDag:
 
     def read_dag_and_replace_placeholders(self):
         with open(self.file_path, 'r', encoding='utf-8') as f:
-            data = f.read()
-            data = data.replace("DAG_NAME_PLACEHOLDER", self.dag_name)
-            data = data.replace("DOCKER_IMAGE_PLACEHOLDER", self.docker_image)
-            data = data.replace("DNS_HOST_PLACEHOLDER", self.dns_host_name)
-            data = data.replace("NAMESPACE_PLACEHOLDER", self.namespace)
-            data = data.replace("ENV_VARS_PLACEHOLDER", json.dumps(self.env_vars, indent=4))
+            data = self._render_template(f)
             return data
 
     def register_dag(self, dag):
         data = json.dumps({
               "description": self.service_name,
               "registrationInstructions": {
-                "dagName": self.dag_name,
-                "dagContent": dag
+                "dagName": self.dag_name
               },
               "workflowName": self.dag_name
             })
@@ -73,11 +87,14 @@ class RegisterDag:
         }
 
         response = requests.post(self.workflow_service_url, headers=headers, data=data)
-        if response.status_code == 200 or response.status_code == 409: #needs to be registered only once as per discussion with team
+        if response.status_code == 200:
             workflow_id = response.json().get('workflowId')
-            print("DAG registered with workflowId: {0}".format(workflow_id))
+            print("DAG {0} registered with workflowId: {1}".format(self.dag_name,workflow_id))
+        elif response.status_code == 409:
+            workflow_id = response.json().get('workflowId')
+            print("DAG {0} is already registered with workflowId: {1}".format(self.dag_name,workflow_id))
         else:
-            print("Error while registering DAG {0}".format(response.text))
+            print("Error while registering DAG {0} with {1}".format(self.dag_name,response.raise_for_status()))
             exit(1)
 
 
