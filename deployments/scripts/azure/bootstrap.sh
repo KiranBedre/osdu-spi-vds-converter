@@ -33,10 +33,8 @@ fi
 export SHARED_TENANT
 
 if [ -z $DAG_TASK_IMAGE ]; then
-  DAG_TASK_IMAGE=${AZURE_REGISTRY}.azurecr.io/vds_dag:latest
+  DAG_TASK_IMAGE=${AZURE_REGISTRY}.azurecr.io/${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}:latest
 fi
-
-
 export DAG_TASK_IMAGE #actual conversion
 #registeration: DAG_LOAD_IMAGE
 

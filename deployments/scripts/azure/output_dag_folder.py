@@ -8,26 +8,21 @@ from jinja2 import Environment, FileSystemLoader
 class CreateDag:
 
   def __init__(self, file_path):
-    self.dag_folder_path = os.environ.get('VDS_DAG_FOLDER_PATH', '../')
+    self.dag_folder_path = os.environ.get('VDS_DAG_FOLDER_PATH', '../airflow/workflow-svc-v2')
+    self.docker_tag = os.environ.get("DOCKER_TAG")
     self.dns_host_name = "{{ var.value.azure_dns_host }}"
     self.namespace = os.environ.get('NAMESPACE')
     self.file_path = file_path
     self.service_name = "segy-to-vds-conversion"
-    self.build_version = os.environ.get('BUILD_VERSION')
+    self.build_version = os.environ.get('BUILD_VERSION', 'latest')
     self.dag_name = f"{self.service_name}-{self.build_version}"
     self.dag_name = self.dag_name[:50]
 
 
     self.env_vars = {
-      "storage_service_endpoint": f"https://{self.dns_host_name}/api/storage/v2",
-      "schema_service_endpoint": f"https://{self.dns_host_name}/api/schema-service/v1",
-      "search_service_endpoint": f"https://{self.dns_host_name}/api/search/v2",
-      "partition_service_endpoint": f"https://{self.dns_host_name}/api/partition/v1",
-      "unit_service_endpoint": f"https://{self.dns_host_name}/api/unit/v2/unit/symbol",
-      "file_service_endpoint": f"https://{self.dns_host_name}/api/file/v2",
-      "KEYVAULT_URI": "{{ var.value.keyvault_uri }}",
-      "appinsights_key": "{{ var.value.appinsights_key }}",
-      "azure_paas_podidentity_isEnabled": "{{ var.value.azure_enable_msi }}"
+      "SD_SVC_URL": f"https://{self.dns_host_name}/seistore-svc/api/v3",
+      "SD_SVC_TOKEN": "TOKEN_PLACEHOLDER",
+      "SD_SVC_API_KEY": "NA",
     }
 
     self.enable_azure_aad_vars = os.environ.get('AZURE_AAD_VARIABLES', 'true')
@@ -47,27 +42,28 @@ class CreateDag:
         }
       }
 
-
     print(f"file_path: {self.file_path}")
+    print(f"openvds_azure.py exists?: {os.path.exists(self.file_path)}")
     print(f"service_name: {self.service_name}")
     print(f"build_version: {self.build_version}")
     print(f"dag_name: {self.dag_name}")
-    
+    print(f"folder: {self.dag_folder_path}")
+    print(f"docker_tag: {self.docker_tag}")
 
   def _render_template(self, file) -> str:
     env = Environment(
-        loader=FileSystemLoader(searchpath=os.getenv("VDS_DAG_FOLDER_PATH", default="./")),
-        variable_start_string='{|', variable_end_string='|}',
+        loader=FileSystemLoader(searchpath=os.getenv("VDS_DAG_FOLDER_PATH", default="airflow/workflow-svc-v2")),
+        variable_start_string='{|', variable_end_string='|}'
     )
     template = env.get_template(os.path.basename(file.name))
 
     params = {
         "DAG_NAME": self.dag_name,
-        "DOCKER_IMAGE": "{{ var.value.dag_image_acr }}/segy-to-vds-conversion:" + self.build_version,
+        "DOCKER_IMAGE": "{{ var.value.dag_image_acr }}/segy-to-vds-conversion:" + self.docker_tag,
         "DNS_HOST": self.dns_host_name,
         "NAMESPACE": self.namespace,
         "ENV_VARS": json.dumps(self.env_vars, indent=4),
-        "K8S_POD_OPERATOR_KWARGS": json.dumps(self.kubernetes_pod_operator_options)
+        "K8S_POD_OPERATOR_KWARGS": json.dumps(self.kubernetes_pod_operator_options, indent=2)
     }
 
     return template.render(**params)
@@ -90,19 +86,19 @@ class CreateDag:
       self.prepare_zip_folder()
 
   def prepare_zip_folder(self):
-      shutil.make_archive('./output_dags/dags/vds_converter', 'zip', './output_dags/temp_folder')
-      shutil.rmtree('./output_dags/temp_folder')
+    shutil.make_archive('./output_dags/dags/vds_converter', 'zip', './output_dags/temp_folder')
+    shutil.rmtree('./output_dags/temp_folder')
 
   def copy_vds_converter_folder(self):
     shutil.copytree(self.dag_folder_path, './output_dags/temp_folder/osdu_vds_converter')
 
   def create_workflow_request_body(self):
-
     file_name = os.environ.get("WORKFLOW_REQUEST_BODY_FILE", "workflow_request_body.json")
     new_file= open("./output_dags/" + file_name, "w")
     data = '[{"workflowName":"DAG_NAME_PLACEHOLDER","description":"VDSConverter","registrationInstructions":{"dagName":"DAG_NAME_PLACEHOLDER"}}]'
     data = data.replace("DAG_NAME_PLACEHOLDER", self.dag_name)
     new_file.write(data)
+    new_file.close()    
 
 if __name__ == "__main__":
 
