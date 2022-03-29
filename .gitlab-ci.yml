@@ -55,7 +55,7 @@ stages:
 include:
   # pipeline logic
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: "master"
+    ref: release/0.14
     file: "standard-setup.yml"
 
   - local: "/devops/azure/override-stages.yml"
@@ -63,7 +63,7 @@ include:
   - local: "/deployments/scripts/gcp/bootstrap_segy_to_vds.yaml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: "master"
+    ref: release/0.14
     file: "cloud-providers/osdu-gcp-dag.yaml"
 
   - local: "/devops/gcp/override-stages.yml"
