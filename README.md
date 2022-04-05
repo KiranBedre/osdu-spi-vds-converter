@@ -1,9 +1,66 @@
 # Segy to Vds Conversion
 
+## Contents
+* [Introduction](#introduction)
+* [DAG File Compilation](#dag-file-compilation)
+* [DAG Release and Distribution](#dag-release-and-distribution)
+* [DAG Deployment](#dag-deployment)
+* * [GCP](#gcp)
+* [Requirements](#requirements)
+* [Testing](#testing)
+* * [Registering a Workflow](#registering-a-workflow)
+* * [Triggering Workflow](#triggering-workflow)
+* [End-to-End Testing](#end-to-end-testing)
+
+
+## Introduction
 Airflow DAG for transformation from SEGY to OpenVDS
 
 
-### Requirements
+## GCP
+The `dags/segy_to_vds_ssdms_conversion_dag.py` DAG stores output to Seismic DDMS.
+
+The `dags/segy_to_vds_conversion_dag.py` DAG stores output to GCS bucket.
+
+# DAG File Compilation
+## GCP
+The `dags/segy_to_vds_ssdms_conversion_dag.py` DAG file contains a number of placeholders `{| |}`, specifying to put proper values there, e.g.
+
+```python 
+DAG_NAME = "{| DAG_NAME |}"
+DOCKER_IMAGE = "{| DOCKER_IMAGE |}"
+NAMESPACE = "{| K8S_NAMESPACE |}"
+...
+```
+
+These values have to be populated before the DAG is deployed.
+To bootstrap the DAG file cloud providers provide their specific `bootstrap` [scripts](deployments).
+
+# DAG Release and Distribution
+
+## GCP
+GCP DAG version is distributed as a generic package. During OSDU release the bootstrapped DAG file is published to the [Gitlab Generic Registy](https://community.opengroup.org/help/user/packages/generic_packages/index.md#publish-a-generic-package-by-using-cicd).
+
+# DAG Deployment
+## GCP
+For GCP, the bootstrapped DAG only uses Airflow variables to populate these values at runtime.
+
+Before deploying this DAG, make sure the following Airlfow variables are set:
+
+| Name  | Default |Description |
+| ------------- |------------- | ------------- |
+| `core__service__seismic__url`| - | OSDU Seismic DDMS URL  |
+| `gcp__data_partition_id`| - | Data partition ID  |
+| `gcp__image__segy_to_vds_converter`| - | SEGY to VDS Converter Image  |
+| `gcp__vds_ingestion_request_memory`| 1Gi | Request Memory  |
+| `gcp__vds_ingestion_request_cpu`| 200m | Request CPU  |
+| `gcp__vds_ingestion_limit_memory`| 1Gi | Memory Limit  |
+| `gcp__vds_ingestion_limit_cpu`| 1000m | CPU Limit  |
+
+**Note**: Environment variables can be used as well. Pelase see [Airflow Documnetation](https://airflow.apache.org/docs/apache-airflow/stable/howto/variable.html#storing-variables-in-environment-variables)
+
+
+# Requirements
 The [Airflow DAG](/src/dags/segy_to_vds_ssdms_conversion_dag.py) has dependencies from [osdu-airflow-lib](https://community.opengroup.org/osdu/platform/data-flow/ingestion/osdu-airflow-lib) package for common operators and backward compatibility.
 
 
@@ -14,7 +71,8 @@ pip install 'osdu-airflow' --extra-index-url=https://community.opengroup.org/api
 ```
 
 
-### Registering a Workflow
+# Testing
+## Registering a Workflow
 ```
 curl --location --request POST 'https://<base_url>/api/workflow/v1/workflow' \
 --header 'Content-Type: application/json' \
@@ -23,7 +81,7 @@ curl --location --request POST 'https://<base_url>/api/workflow/v1/workflow' \
 --data-raw '{
     "description": "SegY To OpenVDS Conversion",
     "registrationInstructions": {
-        "dagName": "openvds_import "
+        "dagName": "openvds_import"
     },
     "workflowName": "openvds_import"
 }'
@@ -43,8 +101,7 @@ Expected Output
 ```
 
 
-
-### Triggering Workflow
+## Triggering Workflow
 
 Configuring the input, url connection and target location, see the 
 
@@ -171,3 +228,6 @@ airflow.exceptions.AirflowException: Pod Launching failed: Pod returned a failur
 [2021-04-01 16:33:24,709] {taskinstance.py:1187} INFO - Marking task as FAILED. dag_id=openvds_import, task_id=OPENVDS, execution_date=20210401T163310, start_date=20210401T163316, end_date=20210401T163324
 [2021-04-01 16:33:26,147] {local_task_job.py:102} INFO - Task exited with return code 1
 ```
+
+## End-to-End Testing
+Deployed `dags/segy_to_vds_ssdms_conversion_dag.py` and `dags/segy_to_vds_conversion_dag.py` DAGs functionality can be tested by [e2e testing collection](https://community.opengroup.org/osdu/platform/testing/-/tree/master/Dev/27_CICD_Setup_SeismicDMSAPI).
