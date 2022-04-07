@@ -9,13 +9,13 @@
 osdu_gcp_bootstrap_dag_community:
   stage: bootstrap_dag
   variables:
-    << : *osdu_gcp_common_bootstrap_variables
+    <<: *osdu_gcp_common_bootstrap_variables
 
 osdu_gcp_bootstrap_dag_pre_ship:
   stage: bootstrap_dag
   variables:
-    << : *osdu_gcp_common_bootstrap_variables
-  
+    <<: *osdu_gcp_common_bootstrap_variables
+
 osdu_gcp_publish_dag:
   stage: publish_dag
   variables:
