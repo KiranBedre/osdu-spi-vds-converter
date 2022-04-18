@@ -16,6 +16,15 @@ osdu_gcp_bootstrap_dag_pre_ship:
   variables:
     <<: *osdu_gcp_common_bootstrap_variables
 
+osdu_anthos_bootstrap_dag:
+  stage: bootstrap_dag
+  variables:
+    ANTHOS_DAG_DIRECTORY: $CI_PROJECT_DIR/src/dags
+    ANTHOS_DEPLOYMENTS_SUBDIR: deployments/scripts/anthos
+    OSDU_ANTHOS_BOOTSTRAP_REQUIREMENTS: deployments/scripts/anthos/requirements.txt
+    OSDU_ANTHOS_BOOTSTRAP_SCRIPT: deployments/scripts/anthos/bootstrap.sh
+    OUTPUT_FILE: ${OSDU_ANTHOS_OUTPUT_DAG_DIR}/segy_to_vds_ssdms_conversion_dag.py
+
 osdu_gcp_publish_dag:
   stage: publish_dag
   variables:
@@ -27,6 +36,12 @@ osdu_gcp_deploy_composer_community:
   variables:
     DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
     OSDU_GCP_DAG_FOLDER: segy_to_vds
+
+osdu_anthos_publish_dag:
+  stage: publish_dag
+  variables:
+    BOOTSTRAPPED_DAG_PATH: ${OSDU_ANTHOS_OUTPUT_DAG_DIR}/segy_to_vds_ssdms_conversion_dag.py
+    DAG_FILE: segy_to_vds_ssdms_conversion_dag.py
 
 osdu_gcp_deploy_composer_pre_ship:
   stage: deploy
