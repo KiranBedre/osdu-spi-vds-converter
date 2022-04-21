@@ -44,6 +44,11 @@ K8S_POD_KWARGS = {| K8S_POD_KWARGS |}
 if not K8S_POD_KWARGS:
     K8S_POD_KWARGS = {}
 seismic_store_url = "{| SEISMIC_STORE_URL |}"
+env_vars = {
+    "SD_SVC_URL": seismic_store_url,
+    "SD_SVC_API_KEY": "test",
+}
+env_vars.update({| EXTRA_ENV_VARS|default('{}') |})
 
 dag = DAG(
     dag_name,
@@ -61,10 +66,7 @@ with dag:
     segy_to_vds = KubernetesPodSegyToOpenVDSOperator(
         task_id='segy_to_vds_ssdms_conversion',
         name='segy_vds_conversion',
-        env_vars={
-            "SD_SVC_URL": seismic_store_url,
-            "SD_SVC_API_KEY": "test"
-        },
+        env_vars=env_vars,
         cmds=['SEGYImport'],
         namespace=k8s_namespace,
         image=docker_image,
