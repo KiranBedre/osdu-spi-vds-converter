@@ -1,0 +1,48 @@
+ibm_deploy:
+  image: openshift/origin-cli
+  tags: ['osdu-medium']
+  stage: deploy
+  variables:
+    IBM_DEPLOY_DIR: ibm_deploy_dir
+    IBM_OPENSHIFT_PROJECT: osdu-airflow
+    IBM_OPENSHIFT_PRESHIP_PROJECT: osdu-airflow
+    IBM_OPENSHIFT_DEVPRI_PROJECT: osdu-airflow
+  before_script:
+    - mkdir -p "$IBM_DEPLOY_DIR"
+    - oc login --token=$IBM_OPENSHIFT_AIRFLOW_TOKEN --server=$IBM_OPENSHIFT_URL
+  script:
+    - oc project $IBM_OPENSHIFT_PROJECT
+    - airflowWebPod=`oc get pods -n osdu-airflow | grep airflow-web* | awk '{ print $1 }'`
+    - echo $airflowWebPod
+    - oc cp src/dags/segy_to_vds_ssdms_conversion_dag_ibm.py $airflowWebPod:/opt/airflow/dags/repo -c airflow-web
+
+
+
+ibm_bootstrap:
+  image: openshift/origin-cli
+  tags: ['osdu-medium']
+  stage: bootstrap_dag
+  variables:
+    IBM_DEPLOY_DIR: ibm_deploy_dir
+    IBM_OPENSHIFT_PROJECT: osdu-airflow
+    IBM_OPENSHIFT_PRESHIP_PROJECT: osdu-airflow
+    IBM_OPENSHIFT_DEVPRI_PROJECT: osdu-airflow
+  before_script:
+    - mkdir -p "$IBM_DEPLOY_DIR"
+    - oc login --token=$IBM_OPENSHIFT_AIRFLOW_TOKEN --server=$IBM_OPENSHIFT_URL
+  script:
+    - oc project $IBM_OPENSHIFT_PROJECT
+    - airflowWebPod=`oc get pods -n osdu-airflow | grep airflow-web* | awk '{ print $1 }'`
+    - echo $airflowWebPod
+    - oc cp devops/ibm/sgy_to_vds.json $airflowWebPod:/opt/airflow/dags/repo -c airflow-web
+    - oc exec $airflowWebPod -c airflow-web -- sh -c "airflow variables import /opt/airflow/dags/repo/sgy_to_vds.json"
+ 
+ibm_integration_tests:
+  image: 
+    name: postman/newman:alpine
+    entrypoint: [""]
+  stage: integration
+  needs: [ibm_deploy]
+  script:
+    - newman --version
+    - newman run ./tests/e2e/ibm/IBM_OVDS_Conversion_Collection.postman_collection.json -e ./tests/e2e/ibm/IBM_OVDS_Conversion_Environment.postman_environment.json
