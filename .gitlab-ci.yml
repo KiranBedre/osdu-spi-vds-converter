@@ -21,6 +21,7 @@ variables:
   AZURE_CLIENT_SECRET: ${AZURE_PRINCIPAL_SECRET}
   AZURE_AD_APP_RESOURCE_ID: ${AZURE_APP_ID}
 
+  OSDU_GCP_ENABLE_BOOTSTRAP: "true"
   OSDU_GCP_COMMUNITY_BUCKET: gs://us-central1-osdu-airflow-f361a286-bucket
   OSDU_GCP_PRESHIP_BUCKET: gs://us-central1-airflow-v2-36b0ff41-bucket
   OSDU_GCP_COMMUNITY_PROJECT: nice-etching-277309
@@ -52,20 +53,29 @@ stages:
   - publish
 
 include:
-  # pipeline logic
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: "master"
     file: "standard-setup.yml"
 
-  - local: "/devops/azure/override-stages.yml"
-  # in case of any changes at project directory structure please make adjustments to Deployment Framework scripts
-  - local: "/deployments/scripts/gcp/bootstrap_segy_to_vds.yaml"
-
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: "master"
     file: "cloud-providers/osdu-gcp-dag.yaml"
 
+  - project: "osdu/platform/ci-cd-pipelines"
+    file: "cloud-providers/osdu-gcp-bootstrap.yml"
+
+  - local: "/devops/azure/override-stages.yml"
   - local: "/devops/gcp/override-stages.yml"
-  
   - local: "/devops/ibm/ibm-stages.yml"
+
+osdu-gcp-containerize-bootstrap-gitlab:
+  variables:
+    IMAGE_NAME: osdu-gcp-bootstrap-segy-to-vds
+    BUILD_ARGS: --build-arg SEGY_VDS_DOCKER_IMAGE_ARG=${SEGY_VDS_DOCKER_IMAGE}
+    BUILD_PATH: deployments/scripts/gcp/Dockerfile
+
+osdu-gcp-containerize-bootstrap-gcr:
+  variables:
+    IMAGE_NAME: osdu-gcp-bootstrap-segy-to-vds
+    BUILD_ARGS: --build-arg SEGY_VDS_DOCKER_IMAGE_ARG=${SEGY_VDS_DOCKER_IMAGE}
+    BUILD_PATH: deployments/scripts/gcp/Dockerfile
+  
 
