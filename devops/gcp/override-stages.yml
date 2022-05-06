@@ -1,0 +1,60 @@
+.osdu_gcp_common_bootstrap_variables: &osdu_gcp_common_bootstrap_variables
+  GCP_DAG_DIRECTORY: $CI_PROJECT_DIR/src/dags
+  GCP_DEPLOYMENTS_SUBDIR: deployments/scripts/gcp
+  OSDU_GCP_BOOTSTRAP_REQUIREMENTS: deployments/scripts/gcp/requirements.txt
+  OSDU_GCP_BOOTSTRAP_SCRIPT: deployments/scripts/gcp/bootstrap.sh
+
+  OUTPUT_FILE: ${OSDU_GCP_OUTPUT_DAG_DIR}/segy_to_vds_ssdms_conversion_dag.py
+
+osdu_gcp_bootstrap_dag_community:
+  stage: bootstrap_dag
+  variables:
+    <<: *osdu_gcp_common_bootstrap_variables
+
+osdu_gcp_bootstrap_dag_pre_ship:
+  stage: bootstrap_dag
+  variables:
+    <<: *osdu_gcp_common_bootstrap_variables
+
+osdu_anthos_bootstrap_dag:
+  stage: bootstrap_dag
+  variables:
+    ANTHOS_DAG_DIRECTORY: $CI_PROJECT_DIR/src/dags
+    ANTHOS_DEPLOYMENTS_SUBDIR: deployments/scripts/anthos
+    OSDU_ANTHOS_BOOTSTRAP_REQUIREMENTS: deployments/scripts/anthos/requirements.txt
+    OSDU_ANTHOS_BOOTSTRAP_SCRIPT: deployments/scripts/anthos/bootstrap.sh
+    OUTPUT_FILE: ${OSDU_ANTHOS_OUTPUT_DAG_DIR}/segy_to_vds_ssdms_conversion_dag.py
+
+osdu_gcp_publish_dag:
+  stage: publish_dag
+  variables:
+    BOOTSTRAPPED_DAG_PATH: ${OSDU_GCP_OUTPUT_DAG_DIR}/segy_to_vds_ssdms_conversion_dag.py
+    DAG_FILE: segy_to_vds_ssdms_conversion_dag.py
+
+osdu_gcp_deploy_composer_community:
+  stage: deploy
+  variables:
+    DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
+    OSDU_GCP_DAG_FOLDER: segy_to_vds
+
+osdu_anthos_publish_dag:
+  stage: publish_dag
+  variables:
+    BOOTSTRAPPED_DAG_PATH: ${OSDU_ANTHOS_OUTPUT_DAG_DIR}/segy_to_vds_ssdms_conversion_dag.py
+    DAG_FILE: segy_to_vds_ssdms_conversion_dag.py
+
+osdu_gcp_deploy_composer_pre_ship:
+  stage: deploy
+  variables:
+    DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
+    OSDU_GCP_DAG_FOLDER: segy_to_vds
+
+osdu_gcp_postman_tests_community:
+  stage: integration
+  variables:
+    COLLECTION_PATH: "Dev/43_CICD_SEGY_VDS_SSDMS/OpenVDS SSDMS_to_SSDMS conversion CI-CD.postman_collection.json"
+
+osdu_gcp_postman_tests_pre_ship:
+  stage: integration
+  variables:
+    COLLECTION_PATH: "Dev/43_CICD_SEGY_VDS_SSDMS/OpenVDS SSDMS_to_SSDMS conversion CI-CD.postman_collection.json"
