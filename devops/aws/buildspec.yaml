@@ -41,7 +41,7 @@ phases:
       - export ECR_IMAGE_BRANCH_LATEST=${ECR_REGISTRY}:${BRANCH_NAME}
       - printenv
 
-      - mkdrir -p ${OUTPUT_DIR}
+      - mkdir -p ${OUTPUT_DIR}
       - echo "Placeholder" >> ${OUTPUT_DIR}/build-info.json # touched so that the output directory has some content incase the build fails so that testing reports are uploaded
 
       - echo "Logging into Docker Hub..."
