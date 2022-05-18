@@ -17,7 +17,6 @@ LABEL maintainer="AWS"
 
 COPY ./deployments/scripts/aws /opt
 
-RUN apt-get update && \
-  chmod 775 /opt/bootstrap.sh
+RUN chmod 775 /opt/bootstrap.sh
 
 CMD ["/bin/bash", "-c", "/opt/bootstrap.sh"]
