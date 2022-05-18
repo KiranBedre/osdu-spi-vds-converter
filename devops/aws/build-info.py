@@ -64,7 +64,7 @@ try:
     codecommit = boto3.client("codecommit")
     commitDetail = codecommit.get_commit(**commitArgs)
 except Exception as e:
-    print("Getting commit information from codecommit failed")
+    print("Getting commit information from CodeCommit failed")
 
 buildInfo = {
     "branch": branch,
