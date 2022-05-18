@@ -39,8 +39,9 @@ phases:
       - export ECR_TAG=`echo build.${BRANCH_NAME}.${CODEBUILD_BUILD_NUMBER}.${CODEBUILD_RESOLVED_SOURCE_VERSION} | cut -c 1-120`
       - export ECR_IMAGE=${ECR_REGISTRY}:${ECR_TAG}
       - export ECR_IMAGE_BRANCH_LATEST=${ECR_REGISTRY}:${BRANCH_NAME}
-      - echo "Placeholder" >> ${OUTPUT_DIR}/build-info.json # touched so that the output directory has some content incase the build fails so that testing reports are uploaded
       - printenv
+
+      - echo "Placeholder" >> ${OUTPUT_DIR}/build-info.json # touched so that the output directory has some content incase the build fails so that testing reports are uploaded
 
       - echo "Logging into Docker Hub..."
       - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
