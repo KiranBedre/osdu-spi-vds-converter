@@ -8,7 +8,7 @@ from jinja2 import Environment, FileSystemLoader
 class CreateDag:
 
   def __init__(self, file_path):
-    self.dag_folder_path = os.environ.get('VDS_DAG_FOLDER_PATH', '../airflow/workflow-svc-v2')
+    self.dag_folder_path = os.environ.get('VDS_DAG_FOLDER_PATH', '../')
     self.docker_tag = os.environ.get("DOCKER_TAG")
     self.dns_host_name = "{{ var.value.azure_dns_host }}"
     self.namespace = os.environ.get('NAMESPACE')
@@ -17,7 +17,6 @@ class CreateDag:
     self.build_version = os.environ.get('BUILD_VERSION', 'latest')
     self.dag_name = f"{self.service_name}-{self.build_version}"
     self.dag_name = self.dag_name[:50]
-
 
     self.env_vars = {
       "SD_SVC_URL": f"https://{self.dns_host_name}/seistore-svc/api/v3",
@@ -59,10 +58,9 @@ class CreateDag:
 
     params = {
         "DAG_NAME": self.dag_name,
-        "DOCKER_IMAGE": "{{ var.value.dag_image_acr }}/segy-to-vds-conversion:" + self.docker_tag,
+        "DOCKER_IMAGE": "{{ var.value.dag_image_acr }}/segy-to-vds-conversion:latest",
         "DNS_HOST": self.dns_host_name,
         "NAMESPACE": self.namespace,
-        "ENV_VARS": json.dumps(self.env_vars, indent=4),
         "K8S_POD_OPERATOR_KWARGS": json.dumps(self.kubernetes_pod_operator_options, indent=2)
     }
 
