@@ -35,6 +35,21 @@ variables:
   OSDU_ANTHOS_OUTPUT_DAG_DIR: bootstraped_dag_anthos
   OSDU_GCP_SEISMIC_STORE_SERVICE_COMMUNITY_ENDPOINT: https://community.gcp.gnrg-osdu.projects.epam.com/api/seismic-store/v3
   OSDU_GCP_SEISMIC_STORE_SERVICE_PRE_SHIP_ENDPOINT: https://preship.osdu.club/api/seismic-store/v3
+  
+  # AWS env vars
+  AWS_DEPLOY_TARGET: EKS
+  # AWS collection vars
+  AWS_COLLECTION_PATH: https://community.opengroup.org/osdu/platform/testing/-/raw/master/Dev/43_CICD_SEGY_VDS_SSDMS/OpenVDS%20SSDMS_to_SSDMS%20conversion%20CI-CD.postman_collection.json
+  AWS_COLLECTION_ENV_PATH: https://community.opengroup.org/osdu/platform/testing/-/raw/master/Postman%20Collection/00_CICD_Setup_Environment/aws.OSDU%20R3%20PROD%20v2.4.postman_environment.json
+  AWS_COLLECTION_TEST_PATH: ''
+  AWS_TEST_FILE_INPUT: ''
+  AWS_TEST_FILE_KEY: ''
+  #Skip stages Variables
+  SKIP_CONTAINERIZE: 'true'
+  SKIP_BOOTSTRAP: 'true'
+  SKIP_PUBLISH: 'true'
+  SKIP_END_TO_END: 'false'
+  AWS_POSTMAN_TESTS_TO_SKIP: "3 Ingest Seismic|3.2 Check the triggered Ingestion workflow status|4.3 Check the triggered OpenVDS workflow status|5 Validate Ingestion|6 Get VDS info|7 Clean-up"
 
 image: google/cloud-sdk:alpine
 
@@ -48,6 +63,7 @@ stages:
   - build
   - scan
   - bootstrap
+  - end_to_end_postman_tests
   - integration
   - attribution
   - publish
@@ -65,6 +81,12 @@ include:
   - local: "/devops/azure/override-stages.yml"
   - local: "/devops/gcp/override-stages.yml"
   - local: "/devops/ibm/ibm-stages.yml"
+  
+  - project: "osdu/platform/ci-cd-pipelines"
+    file: "cloud-providers/aws-global-variables.yml"
+
+  - project: "osdu/platform/ci-cd-pipelines"
+    file: "cloud-providers/aws-dag.yml"
 
 osdu-gcp-containerize-bootstrap-gitlab:
   variables:
