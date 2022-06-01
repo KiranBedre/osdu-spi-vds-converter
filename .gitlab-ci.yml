@@ -22,19 +22,13 @@ variables:
   AZURE_AD_APP_RESOURCE_ID: ${AZURE_APP_ID}
 
   OSDU_GCP_ENABLE_BOOTSTRAP: "true"
-  OSDU_GCP_COMMUNITY_BUCKET: gs://us-central1-osdu-airflow-f361a286-bucket
-  OSDU_GCP_PRESHIP_BUCKET: gs://us-central1-airflow-v2-36b0ff41-bucket
-  OSDU_GCP_COMMUNITY_PROJECT: nice-etching-277309
-  OSDU_GCP_PRE_SHIP_PROJECT: osdu-service-prod
   OSDU_GCP_SERVICE: segy-to-vds-conversion
   OSDU_GCP_VENDOR: gcp
-  OSDU_GCP_K8S_NODE_POOLS: default-pool,pool-1,pool-2
-  OSDU_GCP_SEISMIC_STORE_SERVICE_ENDPOINT: https://seismic-store-attcrcktoa-uc.a.run.app/api/v3
-  SEGY_VDS_DOCKER_IMAGE: "community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest"
+  OSDU_GCP_GCR_REGISTRY: gcr.io/osdu-anthos
+  SEGY_VDS_DOCKER_IMAGE_GITLAB: $CI_REGISTRY_IMAGE/seismic/open-vds/openvds-ingestion:latest
+  SEGY_VDS_DOCKER_IMAGE_GCR: $OSDU_GCP_GCR_REGISTRY/seismic/open-vds/openvds-ingestion:$CI_COMMIT_TAG
   OSDU_GCP_OUTPUT_DAG_DIR: bootstrapped_dag
   OSDU_ANTHOS_OUTPUT_DAG_DIR: bootstraped_dag_anthos
-  OSDU_GCP_SEISMIC_STORE_SERVICE_COMMUNITY_ENDPOINT: https://community.gcp.gnrg-osdu.projects.epam.com/api/seismic-store/v3
-  OSDU_GCP_SEISMIC_STORE_SERVICE_PRE_SHIP_ENDPOINT: https://preship.osdu.club/api/seismic-store/v3
 
 image: google/cloud-sdk:alpine
 
@@ -67,15 +61,15 @@ include:
   - local: "/devops/ibm/ibm-stages.yml"
 
 osdu-gcp-containerize-bootstrap-gitlab:
+  needs: []
   variables:
     IMAGE_NAME: osdu-gcp-bootstrap-segy-to-vds
-    BUILD_ARGS: --build-arg SEGY_VDS_DOCKER_IMAGE_ARG=${SEGY_VDS_DOCKER_IMAGE}
+    BUILD_ARGS: --build-arg SEGY_VDS_DOCKER_IMAGE_ARG=${SEGY_VDS_DOCKER_IMAGE_GITLAB}
     BUILD_PATH: deployments/scripts/gcp/Dockerfile
 
 osdu-gcp-containerize-bootstrap-gcr:
+  needs: []
   variables:
     IMAGE_NAME: osdu-gcp-bootstrap-segy-to-vds
-    BUILD_ARGS: --build-arg SEGY_VDS_DOCKER_IMAGE_ARG=${SEGY_VDS_DOCKER_IMAGE}
+    BUILD_ARGS: --build-arg SEGY_VDS_DOCKER_IMAGE_ARG=${SEGY_VDS_DOCKER_IMAGE_GCR}
     BUILD_PATH: deployments/scripts/gcp/Dockerfile
-  
-
