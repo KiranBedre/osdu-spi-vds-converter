@@ -21,6 +21,9 @@ class DAGFileRenderer:
                 "request_cpu": airflow.models.Variable.get("anthos__vds_ingestion_request_cpu", default_var="200m"),
                 "limit_memory": airflow.models.Variable.get("anthos__vds_ingestion_limit_memory", default_var="8Gi"),
                 "limit_cpu": airflow.models.Variable.get("anthos__vds_ingestion_limit_cpu", default_var="1000m")
+            }, 
+            "annotations": {
+                "sidecar.istio.io/inject": "false"
             }"""
 
     def _prepare_operator_kwargs(self) -> Dict:
