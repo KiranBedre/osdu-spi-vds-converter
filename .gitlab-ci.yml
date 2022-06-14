@@ -87,13 +87,13 @@ include:
 osdu-gcp-containerize-bootstrap-gitlab:
   needs: []
   variables:
-    IMAGE_NAME: osdu-gcp-bootstrap-segy-to-vds
+    IMAGE_BOOTSTRAP_NAME: osdu-gcp-bootstrap-segy-to-vds
     BUILD_ARGS: --build-arg SEGY_VDS_DOCKER_IMAGE_ARG=${SEGY_VDS_DOCKER_IMAGE_GITLAB}
-    BUILD_PATH: deployments/scripts/gcp/Dockerfile
+    BUILD_BOOTSTRAP_PATH : deployments/scripts/gcp/Dockerfile
 
 osdu-gcp-containerize-bootstrap-gcr:
   needs: []
   variables:
-    IMAGE_NAME: osdu-gcp-bootstrap-segy-to-vds
+    IMAGE_BOOTSTRAP_NAME: osdu-gcp-bootstrap-segy-to-vds
     BUILD_ARGS: --build-arg SEGY_VDS_DOCKER_IMAGE_ARG=${SEGY_VDS_DOCKER_IMAGE_GCR}
-    BUILD_PATH: deployments/scripts/gcp/Dockerfile
+    BUILD_BOOTSTRAP_PATH : deployments/scripts/gcp/Dockerfile
