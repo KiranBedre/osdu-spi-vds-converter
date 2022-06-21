@@ -31,30 +31,36 @@ osdu_gcp_publish_dag:
     BOOTSTRAPPED_DAG_PATH: ${OSDU_GCP_OUTPUT_DAG_DIR}/segy_to_vds_ssdms_conversion_dag.py
     DAG_FILE: segy_to_vds_ssdms_conversion_dag.py
 
-osdu_gcp_deploy_composer_community:
-  stage: deploy
-  variables:
-    DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
-    OSDU_GCP_DAG_FOLDER: segy_to_vds
-
 osdu_anthos_publish_dag:
   stage: publish_dag
   variables:
     BOOTSTRAPPED_DAG_PATH: ${OSDU_ANTHOS_OUTPUT_DAG_DIR}/segy_to_vds_ssdms_conversion_dag.py
     DAG_FILE: segy_to_vds_ssdms_conversion_dag.py
 
+osdu_gcp_deploy_composer_community:
+  stage: deploy
+  variables:
+    DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
+    OSDU_GCP_DAG_FOLDER: segy_to_vds
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/osdu-gcp-$OSDU_GCP_SERVICE:latest
+    IMAGE_TAG_VARIABLE_NAME: gcp__image__segy_to_vds_converter  
+
 osdu_gcp_deploy_composer_pre_ship:
   stage: deploy
   variables:
     DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
     OSDU_GCP_DAG_FOLDER: segy_to_vds
+    IMAGE_TAG: $OSDU_GCP_GCR_REGISTRY/seismic/open-vds/openvds-ingestion:$CI_COMMIT_TAG
+    IMAGE_TAG_VARIABLE_NAME: gcp__image__segy_to_vds_converter  
 
 osdu_gcp_deploy_composer_anthos_env:
   stage: deploy
   needs: ["osdu_anthos_publish_dag"]
   variables:
     DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
-    OSDU_GCP_DAG_FOLDER: segy_to_zgy
+    OSDU_GCP_DAG_FOLDER: segy_to_vds
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/osdu-gcp-$OSDU_GCP_SERVICE:latest
+    IMAGE_TAG_VARIABLE_NAME: anthos__image__segy_to_vds_converter  
 
 osdu_gcp_postman_tests_community:
   stage: integration
