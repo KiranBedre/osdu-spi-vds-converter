@@ -42,7 +42,7 @@ osdu_gcp_deploy_composer_community:
   variables:
     DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
     OSDU_GCP_DAG_FOLDER: segy_to_vds
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/osdu-gcp-$OSDU_GCP_SERVICE:latest
+    IMAGE_TAG: $OSDU_GCP_GCR_REGISTRY/seismic/open-vds/openvds-ingestion
     IMAGE_TAG_VARIABLE_NAME: gcp__image__segy_to_vds_converter  
 
 osdu_gcp_deploy_composer_pre_ship:
@@ -59,7 +59,7 @@ osdu_gcp_deploy_composer_anthos_env:
   variables:
     DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
     OSDU_GCP_DAG_FOLDER: segy_to_vds
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/osdu-gcp-$OSDU_GCP_SERVICE:latest
+    IMAGE_TAG: $OSDU_GCP_GCR_REGISTRY/seismic/open-vds/openvds-ingestion
     IMAGE_TAG_VARIABLE_NAME: anthos__image__segy_to_vds_converter  
 
 osdu_gcp_postman_tests_community:
