@@ -27,18 +27,25 @@ osdu_anthos_bootstrap_dag:
 
 osdu_gcp_publish_dag:
   stage: publish_dag
+  needs: 
+  - job: osdu_gcp_bootstrap_dag_community
+    optional: true
+  - job: osdu_gcp_bootstrap_dag_pre_ship
+    optional: true
   variables:
     BOOTSTRAPPED_DAG_PATH: ${OSDU_GCP_OUTPUT_DAG_DIR}/segy_to_vds_ssdms_conversion_dag.py
     DAG_FILE: segy_to_vds_ssdms_conversion_dag.py
 
 osdu_anthos_publish_dag:
   stage: publish_dag
+  needs: ["osdu_anthos_bootstrap_dag"]
   variables:
     BOOTSTRAPPED_DAG_PATH: ${OSDU_ANTHOS_OUTPUT_DAG_DIR}/segy_to_vds_ssdms_conversion_dag.py
     DAG_FILE: segy_to_vds_ssdms_conversion_dag.py
 
 osdu_gcp_deploy_composer_community:
   stage: deploy
+  needs: ["osdu_gcp_bootstrap_dag_community"]
   variables:
     DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
     OSDU_GCP_DAG_FOLDER: segy_to_vds
@@ -47,6 +54,7 @@ osdu_gcp_deploy_composer_community:
 
 osdu_gcp_deploy_composer_pre_ship:
   stage: deploy
+  needs: ["osdu_gcp_bootstrap_dag_pre_ship"]
   variables:
     DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
     OSDU_GCP_DAG_FOLDER: segy_to_vds
@@ -55,7 +63,7 @@ osdu_gcp_deploy_composer_pre_ship:
 
 osdu_gcp_deploy_composer_anthos_env:
   stage: deploy
-  needs: ["osdu_anthos_publish_dag"]
+  needs: ["osdu_anthos_bootstrap_dag"]
   variables:
     DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
     OSDU_GCP_DAG_FOLDER: segy_to_vds
