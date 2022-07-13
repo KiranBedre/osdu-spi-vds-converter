@@ -66,7 +66,7 @@ osdu_gcp_deploy_composer_anthos_env:
   stage: deploy
   needs: ["osdu_anthos_bootstrap_dag"]
   variables:
-    DAG_FOLDER: $OSDU_GCP_OUTPUT_DAG_DIR
+    DAG_FOLDER: $OSDU_ANTHOS_OUTPUT_DAG_DIR
     OSDU_GCP_DAG_FOLDER: segy_to_vds
     IMAGE_TAG: $SEGY_VDS_DOCKER_IMAGE_GITLAB
     IMAGE_TAG_VARIABLE_NAME: anthos__image__segy_to_vds_converter  
