@@ -39,7 +39,7 @@ class DAGFileRenderer:
 
     def _render_template(self, file) -> str:
         env = Environment(
-            loader=FileSystemLoader(searchpath=os.getenv("GCP_DAG_DIRECTORY", default="src/dags")),
+            loader=FileSystemLoader(searchpath=os.getenv("OSDU_GCP_DAG_DIRECTORY", default="src/dags")),
             variable_start_string='{|', variable_end_string='|}',
         )
         template = env.get_template(os.path.basename(file.name))
