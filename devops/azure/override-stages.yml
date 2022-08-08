@@ -24,7 +24,7 @@ azure_build_dag:
   image: danielscholl/azure-build-image
   only: 
     variables: 
-      - "$AZURE == 'true'"
+      - "$AZURE == '1'"
   script: 
     - |
         cat > .env << EOF
@@ -39,7 +39,7 @@ azure_build_dag:
         BUILD_VERSION=$CI_COMMIT_SHA
         EOF
           
-        docker build -t $CI_REGISTRY_IMAGE/$DAG_TASK_IMAGE --file DAG.Dockerfile .
+        docker build -t $CI_REGISTRY_IMAGE/$DAG_TASK_IMAGE --file deployments/scripts/azure/DAG.Dockerfile .
         docker build -t $CI_REGISTRY_IMAGE/$DAG_LOAD_IMAGE --file deployments/scripts/azure/Dockerfile .
         docker push $CI_REGISTRY_IMAGE/$DAG_TASK_IMAGE
         docker push $CI_REGISTRY_IMAGE/$DAG_LOAD_IMAGE
@@ -76,7 +76,7 @@ azure_register_dag:
     - azure_build_dag
   only: 
     variables: 
-      - "$AZURE == 'true'"
+      - "$AZURE == '1'"
   script: 
     - |
         cat > requirements.txt << EOF
@@ -149,12 +149,27 @@ azure_register_dag:
             self.register_dag()
         
           def register_dag(self):
-            data = '{"workflowName":"$DAG_NAME","description":"$DAG_NAME","registrationInstructions":{"dagName":"$DAG_NAME"}}'
+            # To register DAG workflow name must match pattern ^[a-zA-Z0-9._-]{1,64}$
+            dag_name = '$DAG_NAME'
+            formatted_dag_name = dag_name[:63]
+
+            data = json.dumps(
+              {
+                "workflowName": formatted_dag_name,
+                "description": formatted_dag_name,
+                "registrationInstructions":
+                  {
+                    "dagName": formatted_dag_name
+                  }
+              })
+
             headers = {
                   'Content-Type': 'application/json',
                   'Authorization': self.token,
                   'data-partition-id': self.data_partition_id
                 }
+
+            print(f"Attempting to register DAG with name {formatted_dag_name}")
 
             response = requests.post(self.workflow_service_url, headers=headers, data=data)
             if response.status_code == 200:
@@ -164,7 +179,8 @@ azure_register_dag:
               workflow_id = response.json().get('workflowId')
               print("DAG is already registered with workflowId: {0}".format(workflow_id))
             else:
-              print("Error while registering DAG {0}".format(response.raise_for_status()))
+              print(f"Error while registering DAG due to: {response.json().get('message')}")
+              print("Error: {0}".format(response.raise_for_status()))
          
         if __name__ == "__main__":
           RegisterDag().register()
@@ -197,7 +213,7 @@ azure_copy_dag:
     - azure_register_dag
   only: 
     variables: 
-      - "$AZURE == 'true'"
+      - "$AZURE == '1'"
   script: 
     - |
         # Installing the Azcopy utility
