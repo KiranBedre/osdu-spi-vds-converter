@@ -1,9 +1,9 @@
-FROM community.opengroup.org:5555/osdu/platform/deployment-and-operations/base-containers-azure/alpine-python3:0.0.2
+FROM mcr.microsoft.com/mirror/docker/library/python:3.8-slim
 
 ARG DATA_PARTITION=opendes
 
 ENV BUILD_PACKAGES \
-  py-cryptography
+  python3-cryptography
 
 ENV PYTHONUNBUFFERED=1 \
   PATH="/home/osdu/.local/bin:${PATH}" \
@@ -17,15 +17,25 @@ USER root
 
 RUN set -x \
   echo "**** install Python ****" && \
-  apk update && \
-  apk add --no-cache ${BUILD_PACKAGES} &&\
-  rm -rf /var/cache/apk/*
+  apt-get update && \
+  apt-get install -y -o APT::Keep-Downloaded-Packages=false ${BUILD_PACKAGES} &&\
+  rm -rf /var/cache/apt/archives/*
 
 # Install Requirements
 ADD deployments/scripts/azure/requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
+# Add debian repo to install busybox package
+RUN \
+  echo '@debian http://deb.debian.org/debian' >> /etc/apt/repositories && \
+  echo '@debian http://deb.debian.org/debian-security' >> /etc/apt/repositories
+
+RUN \
+  apt-get update && \
+  apt-get install busybox -y
+
 # Add Scripts
+WORKDIR /home/osdu
 ADD deployments/scripts/azure/*.py scripts/
 ADD deployments/scripts/azure/bootstrap.sh scripts/
 RUN chmod +x scripts/bootstrap.sh
@@ -34,6 +44,7 @@ RUN chmod +x scripts/bootstrap.sh
 ADD airflow airflow
 
 # Execute as non root user.
+RUN addgroup --system osdu && adduser --system osdu --ingroup osdu
 USER osdu
 WORKDIR /home/osdu/scripts
 
