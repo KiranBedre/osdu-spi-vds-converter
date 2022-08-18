@@ -11,7 +11,7 @@ class DAGFileRenderer:
         self.docker_image = "{{ var.value.anthos__image__segy_to_vds_converter }}"
         # As for 25 FEB 2022, there is no namespace parameter in template_fields (https://github.com/apache/airflow/blob/2.2.0/airflow/providers/cncf/kubernetes/operators/kubernetes_pod.py#L165), 
         # so we have to hardcode this value for now.
-        self.namespace = "{{ var.value.anthos__parsers_k8s_namespace }}"
+        self.namespace = "default"
         self.sd_svc_url = "{{ var.value.core__service__seismic__url }}"
         self.dag_name = "Segy_to_vds_conversion_sdms"
 
