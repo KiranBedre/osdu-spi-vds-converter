@@ -1,15 +1,13 @@
 FROM mcr.microsoft.com/mirror/docker/library/python:3.8-slim
 
-ARG DATA_PARTITION=opendes
-
 ENV BUILD_PACKAGES \
   python3-cryptography
 
 ENV PYTHONUNBUFFERED=1 \
   PATH="/home/osdu/.local/bin:${PATH}" \
-  DATA_PARTITION=${DATA_PARTITION} \
-  DAG_DIRECTORY=../airflow/workflow-svc-v2 \
-  DAG_TASK_IMAGE=${DAG_TASK_IMAGE} \
+  DAG_DIRECTORY=/home/osdu/airflow \
+  NAMESPACE=${NAMESPACE} \
+  BUILD_VERSION=${BUILD_VERSION} \
   AZURE_DEPLOYMENTS_SUBDIR=. \
   AZURE_DEPLOYMENTS_SCRIPTS_SUBDIR=.
 
@@ -37,15 +35,22 @@ RUN \
 # Add Scripts
 WORKDIR /home/osdu
 ADD deployments/scripts/azure/*.py scripts/
-ADD deployments/scripts/azure/bootstrap.sh scripts/
-RUN chmod +x scripts/bootstrap.sh
+ADD deployments/scripts/azure/prepare_dags.sh scripts/
+RUN chmod +x scripts/prepare_dags.sh
 
 # Add DAGs
-ADD airflow airflow
+ADD src/dags airflow
+
+# Add output_dags folder
+RUN mkdir -p /home/osdu/output_dags
 
 # Execute as non root user.
 RUN addgroup --system osdu && adduser --system osdu --ingroup osdu
-USER osdu
-WORKDIR /home/osdu/scripts
 
-ENTRYPOINT ["/home/osdu/scripts/bootstrap.sh"]
+RUN chgrp osdu /home/osdu/output_dags
+RUN chmod g+w /home/osdu/output_dags
+
+USER osdu
+WORKDIR /home/osdu
+
+ENTRYPOINT ["scripts/prepare_dags.sh"]

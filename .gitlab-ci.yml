@@ -41,6 +41,7 @@ stages:
   - review
   - linters
   - build
+  - test
   - containerize
   - bootstrap_dag
   - publish_dag
@@ -59,6 +60,9 @@ include:
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/osdu-gcp-dag.yaml"
+
+  - project: "osdu/platform/ci-cd-pipelines"
+    file: "cloud-providers/azure_dag.yml"
 
   - local: "/devops/azure/override-stages.yml"
   - local: "/devops/gcp/pipeline/override-stages.yml"
