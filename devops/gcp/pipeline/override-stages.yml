@@ -41,14 +41,3 @@ osdu-gcp-deploy-dag:anthos:
     IMAGE_TAG_VARIABLE_NAME: anthos__image__segy_to_vds_converter
     # FIXME: an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
     OSDU_GCP_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest
-
-osdu-gcp-deploy-dag:dev2:
-  # FIXME: an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
-  before_script:
-    - export OSDU_GCP_COMPOSER_TAG=$OSDU_GCP_GCR_REGISTRY/seismic/open-vds/openvds-ingestion:${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}
-    - echo $OSDU_GCP_COMPOSER_TAG
-
-osdu-gcp-deploy-dag:preship:
-  variables:
-    # FIXME: an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
-    OSDU_GCP_COMPOSER_TAG: $OSDU_GCP_GCR_REGISTRY/seismic/open-vds/openvds-ingestion:$CI_COMMIT_TAG
