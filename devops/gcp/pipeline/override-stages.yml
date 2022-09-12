@@ -1,5 +1,5 @@
 variables:
-  OSDU_GCP_ENABLE_BOOTSTRAP: "true"
+  OSDU_GCP_ENABLE_BOOTSTRAP: "false"
   OSDU_GCP_SERVICE: segy-to-vds
   OSDU_GCP_DAG_DIRECTORY: src/dags
   OSDU_GCP_DAG_FILE: segy_to_vds_ssdms_conversion_dag.py
@@ -9,27 +9,13 @@ variables:
   # Postman tests
   COLLECTION_PATH: "Dev/43_CICD_SEGY_VDS_SSDMS/OpenVDS SSDMS_to_SSDMS conversion CI-CD.postman_collection.json"
 
-# FIXME: delete after package registry usage is implemented in DF
-osdu-gcp-containerize-bootstrap-gitlab:
-  variables:
-    IMAGE_BOOTSTRAP_NAME: osdu-gcp-bootstrap-segy-to-vds
-    BUILD_ARGS: --build-arg SEGY_VDS_DOCKER_IMAGE_ARG=community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest
-    BUILD_BOOTSTRAP_PATH: deployments/scripts/gcp/Dockerfile
-
-# FIXME: delete after package registry usage is implemented in DF
-osdu-gcp-containerize-bootstrap-gcr:
-  variables:
-    IMAGE_BOOTSTRAP_NAME: osdu-gcp-bootstrap-segy-to-vds
-    BUILD_ARGS: --build-arg SEGY_VDS_DOCKER_IMAGE_ARG=$OSDU_GCP_GCR_REGISTRY/seismic/open-vds/openvds-ingestion:$CI_COMMIT_TAG
-    BUILD_BOOTSTRAP_PATH: deployments/scripts/gcp/Dockerfile
-
 # Community, Dev2, Preship
 osdu-gcp-render-dag:
-  needs: ["osdu-gcp-containerize-bootstrap-gitlab"]
+  needs: []
 
 # Anthos
 osdu-gcp-render-dag:anthos:
-  needs: ["osdu-gcp-containerize-bootstrap-gitlab"]
+  needs: []
 
 osdu-gcp-deploy-dag:community:
   variables:
