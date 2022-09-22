@@ -54,6 +54,7 @@ stages:
   - attribution
   - publish
 
+
 include:
   - project: "osdu/platform/ci-cd-pipelines"
     file: "standard-setup.yml"
