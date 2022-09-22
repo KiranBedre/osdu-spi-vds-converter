@@ -33,7 +33,7 @@ variables:
   SKIP_BOOTSTRAP: "true"
   SKIP_PUBLISH: "true"
   SKIP_END_TO_END: "false"
-  AWS_POSTMAN_TESTS_TO_SKIP: "3.2 Check the triggered Ingestion workflow status|4.1 Unlock SEGY|4.3 Check the triggered OpenVDS workflow status|5 Validate Ingestion|6 Get VDS info|7 Clean-up"
+  AWS_POSTMAN_TESTS_TO_SKIP: "3 Ingest Seismic|3.2 Check the triggered Ingestion workflow status|4.1 Unlock SEGY|4.3 Check the triggered OpenVDS workflow status|5 Validate Ingestion|6 Get VDS info|7 Clean-up"
   AWS: 1
 image: google/cloud-sdk:alpine
 
@@ -53,7 +53,6 @@ stages:
   - integration
   - attribution
   - publish
-
 
 include:
   - project: "osdu/platform/ci-cd-pipelines"
