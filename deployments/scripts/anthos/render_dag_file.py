@@ -1,5 +1,7 @@
 import argparse
 import os
+import pathlib
+from dag_version_creation.dag_version_creation import DAGVersionGenerator
 from jinja2 import Environment, FileSystemLoader
 from typing import Dict, List
 
@@ -61,6 +63,11 @@ class DAGFileRenderer:
         output_path = output_path or self.file_path
         with open(self.file_path, "r") as f:
             rendered_file_data = self._render_template(f)
+
+        rendered_file_data = DAGVersionGenerator(
+            rendered_file_data, 
+            f"{pathlib.Path(__file__).parent.resolve()}/VERSION"
+        ).add_dag_version()
 
         with open(output_path, "w") as f:
             f.write(rendered_file_data)
