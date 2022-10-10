@@ -1,0 +1,62 @@
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: osdu-vds-dag-setup-job
+  labels:
+    app: osdu-vds-dag-setup-job
+    job-name: osdu-vds-dag-setup-job
+spec:
+  activeDeadlineSeconds: 900
+  parallelism: 1
+  completions: 1
+  backoffLimit: 6
+  selector:
+    matchLabels:
+  template:
+    metadata:
+      name: osdu-vds-dag-setup-job
+      creationTimestamp: null
+      labels:
+        app: osdu-vds-dag-setup-job
+        job-name: osdu-vds-dag-setup-job
+    spec:
+      restartPolicy: OnFailure
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 0
+      containers:
+        - name: deploy-dags
+          image: >-
+            alpine/k8s:1.21.12
+          command:
+            - /bin/sh
+            - '-c'
+            - |
+              # Execute scripts "chown -R 50000:root /opt/airflow/dags; chmod 775 /opt/airflow/dags"
+              /tmp/scripts/copy-dags.sh
+              /tmp/scripts/replace-values.sh
+          resources:
+            requests:
+              cpu: 5m
+              memory: 5Mi
+          volumeMounts:
+            - name: scripts-pvc
+              mountPath: /tmp/scripts
+            - name: dags-pvc
+              mountPath: /opt/airflow/dags
+              subPath: dags
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      volumes:
+        - name: scripts-pvc
+          projected:
+            defaultMode: 0755
+            sources:
+              - configMap:
+                  name: osdu-vds-dag-config
+        - name: dags-pvc
+          persistentVolumeClaim:
+            claimName: dags-pvc
+      dnsPolicy: ClusterFirst

@@ -15,6 +15,7 @@
 #  limitations under the License.
 
 variables:
+  IBM_HELM_DAG_PATH: devops/ibm/ibm-vds-dag
   AZURE_SERVICE: segy-to-vds-conversion
   AZURE_DEPLOYMENTS_SUBDIR: deployments/scripts/azure
   AZURE_CLIENT_ID: ${AZURE_PRINCIPAL_ID}
