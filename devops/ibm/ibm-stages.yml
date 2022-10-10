@@ -17,6 +17,19 @@ ibm_deploy:
     - oc cp src/dags/segy_to_vds_ssdms_conversion_dag_ibm.py $airflowWebPod:/opt/airflow/dags/repo -c airflow-web
 
 
+ibm-helm-charts-master:
+  stage: build
+  tags: ["osdu-small"]
+  image:
+    name: alpine/helm:3.6.3
+    entrypoint: [""]
+  before_script:
+    - cp src/dags/segy_to_vds_ssdms_conversion_dag.py devops/ibm/ibm-vds-dag/files/.
+    - helm plugin install https://github.com/chartmuseum/helm-push.git
+  script:
+    - helm cm-push ${IBM_HELM_DAG_PATH} ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/stable --username gitlab-ci-token --password $CI_JOB_TOKEN  
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
 
 ibm_bootstrap:
   image: openshift/origin-cli
