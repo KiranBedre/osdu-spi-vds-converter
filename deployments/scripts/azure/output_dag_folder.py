@@ -31,7 +31,7 @@ class CreateDag:
 
         self.kubernetes_pod_operator_options = {
             "labels": {
-                "aadpodidbinding": "osdu-identity"
+                "aadpodidbinding": os.environ.get('POD_IDENTITY_TAG', "osdu-identity")
             },
             "annotations": {
                 "sidecar.istio.io/inject": "false"
