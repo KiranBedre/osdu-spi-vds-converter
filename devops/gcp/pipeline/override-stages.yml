@@ -7,7 +7,7 @@ variables:
   IMAGE_TAG_VARIABLE_NAME: gcp__image__segy_to_vds_converter
   OSDU_GCP_GCR_REGISTRY: gcr.io/osdu-anthos
   # Postman tests
-  COLLECTION_PATH: "Dev/43_CICD_SEGY_VDS_SSDMS/OpenVDS SSDMS_to_SSDMS conversion CI-CD.postman_collection.json"
+  COLLECTION_PATH: "Postman Collection/40_CICD_SEGY_OpenVDS_Conversion/SegyToOpenVDS conversion using Seisstore CI-CD v1.0.postman_collection.json"
 
 # Community, Dev2, Preship
 osdu-gcp-render-dag:
