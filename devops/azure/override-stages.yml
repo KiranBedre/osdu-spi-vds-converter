@@ -53,4 +53,4 @@ azure_dag_postman_tests:
       EOF
     - |
       export BUILD_VERSION=$(echo ${CI_COMMIT_SHA} | cut -c -5)
-      export DAG_NAME="segy-to-vds-conversion-${BUILD_VERSION}"
+      export DAG_NAME="segy-to-vds-conversion"

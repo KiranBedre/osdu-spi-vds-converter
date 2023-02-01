@@ -16,7 +16,7 @@ class CreateDag:
         self.file_path = file_path
         self.service_name = "segy-to-vds-conversion"
         self.build_version = os.environ.get('BUILD_VERSION', 'latest')
-        self.dag_name = f"{self.service_name}-{self.build_version}"
+        self.dag_name = f"{self.service_name}"
         self.dag_name = self.dag_name[:50]
 
         self.env_vars = {}
