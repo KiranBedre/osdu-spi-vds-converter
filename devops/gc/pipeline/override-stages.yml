@@ -1,39 +1,39 @@
 variables:
-  OSDU_GCP_ENABLE_BOOTSTRAP: "false"
-  OSDU_GCP_SERVICE: segy-to-vds
-  OSDU_GCP_DAG_DIRECTORY: src/dags
-  OSDU_GCP_DAG_FILE: segy_to_vds_ssdms_conversion_dag.py
-  OUTPUT_FILE: $OSDU_GCP_RENDERED_DAG_FOLDER/$OSDU_GCP_DAG_FILE
+  GC_ENABLE_BOOTSTRAP: "false"
+  GC_SERVICE: segy-to-vds
+  GC_DAG_DIRECTORY: src/dags
+  GC_DAG_FILE: segy_to_vds_ssdms_conversion_dag.py
+  OUTPUT_FILE: $GC_RENDERED_DAG_FOLDER/$GC_DAG_FILE
   IMAGE_TAG_VARIABLE_NAME: gcp__image__segy_to_vds_converter
-  OSDU_GCP_GCR_REGISTRY: gcr.io/osdu-anthos
+  GC_GCR_REGISTRY: gcr.io/osdu-anthos
   # Postman tests
   COLLECTION_PATH: "Postman%20Collection/40_CICD_SEGY_OpenVDS_Conversion/SegyToOpenVDS%20conversion%20using%20Seisstore%20CI-CD%20v1.0.postman_collection.json"
 
 # Community, Dev2, Preship
-osdu-gcp-render-dag:
+gc-render-dag:
   needs: []
 
 # Anthos
-osdu-gcp-render-dag:anthos:
+gc-render-dag:anthos:
   needs: []
 
-osdu-gcp-deploy-dag:community:
+gc-deploy-dag:community:
   variables:
     # FIXME (GONRG-5847): an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
-    OSDU_GCP_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest
+    GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest
 
-osdu-gcp-deploy-dag:anthos:
+gc-deploy-dag:anthos:
   variables:
     IMAGE_TAG_VARIABLE_NAME: anthos__image__segy_to_vds_converter
     # FIXME (GONRG-5847): an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
-    OSDU_GCP_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest
+    GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest
 
-osdu-gcp-deploy-dag:dev2:
+gc-deploy-dag:dev2:
   variables:
     # FIXME (GONRG-5847): an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
-    OSDU_GCP_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest
+    GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest
 
-osdu-gcp-deploy-dag:preship:
+gc-deploy-dag:preship:
   variables:
     # FIXME (GONRG-5847): an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
-    OSDU_GCP_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest
+    GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest

@@ -59,13 +59,13 @@ include:
     file: "standard-setup.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    file: "cloud-providers/osdu-gcp-dag.yaml"
+    file: "cloud-providers/gc-dag.yaml"
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/azure_dag.yml"
 
   - local: "/devops/azure/override-stages.yml"
-  - local: "/devops/gcp/pipeline/override-stages.yml"
+  - local: "/devops/gc/pipeline/override-stages.yml"
   - local: "/devops/ibm/ibm-stages.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
@@ -73,4 +73,3 @@ include:
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/aws-dag.yml"
-    

@@ -10,8 +10,8 @@ export SEGY_VDS_DOCKER_IMAGE="<image_tag>"
 export K8S_NODE_POOLS=<node_pools>  # i.e. pool-1,pool-2  the value will be split by comma
 export SD_SVC_URL=<ssdms_host>  # i.e https://<ssdms_host>/seistore-svc/api/v3
 
-OSDU_GCP_DEPLOYMENTS_SUBDIR="<path_to_folder>" # ie: path to Google Cloud deployment scripts folder
-OSDU_GCP_DAG_DIRECTORY="<path_to_folder>" # ie: segy-to-vds-conversion/airflow/workflow-svc-v2
+GC_DEPLOYMENTS_SUBDIR="<path_to_folder>" # ie: path to Google Cloud deployment scripts folder
+GC_DAG_DIRECTORY="<path_to_folder>" # ie: segy-to-vds-conversion/airflow/workflow-svc-v2
 
 OUTPUT_FILE="<path_to_output_file>" # ie. to avoid original file overwriting
 

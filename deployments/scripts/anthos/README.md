@@ -5,8 +5,8 @@
 pip install Jinja2==2.10.1
 
 # Setup Variables
-OSDU_GCP_DEPLOYMENTS_SUBDIR="<path_to_folder>" # ie: path to GCP deployment scripts folder
-OSDU_GCP_DAG_DIRECTORY="<path_to_folder>" # ie: segy-to-vds-conversion/airflow/workflow-svc-v2
+GC_DEPLOYMENTS_SUBDIR="<path_to_folder>" # ie: path to Google Cloud deployment scripts folder
+GC_DAG_DIRECTORY="<path_to_folder>" # ie: segy-to-vds-conversion/airflow/workflow-svc-v2
 
 OUTPUT_FILE="<path_to_output_file>" # ie. to avoid original file overwriting
 
