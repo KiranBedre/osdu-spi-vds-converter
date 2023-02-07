@@ -106,4 +106,4 @@ with dag:
         trigger_rule="all_done"
     )
 
-update_status_running >> openvds_converter >> update_status_finished # pylint: disable=pointless-statement
+update_status_running >> openvds_converter >> process_single_manifest_file >> update_status_finished # pylint: disable=pointless-statement
