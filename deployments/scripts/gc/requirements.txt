@@ -1,0 +1,6 @@
+Jinja2==2.10.1
+markupsafe==2.0.1
+
+# https://community.opengroup.org/osdu/platform/deployment-and-operations/base-containers-gcp/dag-versioning
+--extra-index-url https://community.opengroup.org/api/v4/projects/1341/packages/pypi/simple
+osdu-dag-versioning 

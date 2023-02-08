@@ -189,9 +189,18 @@ python sdutil unlock sd://<tenant>/<subproject>/<path>/<file_name>  --idtoken=$I
 
 ### Ingest the WorkProduct of the Segy-file
 
-Ingest the corresponding Manifest with using Manifest-based-ingestion. The `sd-path` must be set as a value of `data.DatasetsProperties.FileCollectionPath` of the dataset--FileCollection.SEGY record. 
+Ingest the corresponding Manifest with using Manifest-based-ingestion (Osdu_ingest DAG). The `sd-path` must be set as a value of `data.DatasetsProperties.FileCollectionPath` of the dataset--FileCollection.SEGY record. 
 
 Then, you can use the Ids of the File and WorkProduct records for the further conversion.
+
+The example of such WorkProducts can be found [here](https://community.opengroup.org/osdu/platform/data-flow/data-loading/open-test-data/-/tree/master/rc--3.0.0/4-instances/Volve/work-products/seismics).
+
+The place where `sd-path` of the previously uploaded to Seismic DMS file is supposed to be specified [here](https://community.opengroup.org/osdu/platform/data-flow/data-loading/open-test-data/-/blob/master/rc--3.0.0/4-instances/Volve/work-products/seismics/load_seismic_trace_data_ST0202R08-PS_PSDM_FULL_OFFSET_DEPTH.json#L413).
+
+
+Also, the convertor can override default byte locations. This information can be stored in `data.VectorHeaderMapping[]` of the file record.
+The DAG can get this information from the file record and pass to the convertor.
+
 
 ### Start Segy -> OpenVDS conversion workflow
 

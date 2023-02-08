@@ -22,10 +22,10 @@ echo "------------------------------------";
 
 if [ -z $OUTPUT_FILE ]; then
   echo "THE ORIGINAL DAG FILE WILL BE OVERWRITTEN"
-  python3 $GCP_DEPLOYMENTS_SUBDIR/render_dag_file.py -f $GCP_DAG_DIRECTORY/segy_to_vds_ssdms_conversion_dag.py
+  python3 $GC_DEPLOYMENTS_SUBDIR/render_dag_file.py -f $GC_DAG_DIRECTORY/segy_to_vds_ssdms_conversion_dag.py
 else
   echo "RENDERED OUTPUT WILL BE SAVED INTO ${OUTPUT_FILE}"
-  python3 $GCP_DEPLOYMENTS_SUBDIR/render_dag_file.py -f $GCP_DAG_DIRECTORY/segy_to_vds_ssdms_conversion_dag.py -o ${OUTPUT_FILE}
+  python3 $GC_DEPLOYMENTS_SUBDIR/render_dag_file.py -f $GC_DAG_DIRECTORY/segy_to_vds_ssdms_conversion_dag.py -o ${OUTPUT_FILE}
 fi
 
 if test $? = '1'; then
@@ -41,4 +41,3 @@ else
   echo "------------------------------------";
   exit 0
 fi
-

@@ -1,2 +1,0 @@
-Jinja2==2.10.1
-markupsafe==2.0.1

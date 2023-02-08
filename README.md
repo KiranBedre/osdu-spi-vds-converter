@@ -5,7 +5,7 @@
 * [DAG File Compilation](#dag-file-compilation)
 * [DAG Release and Distribution](#dag-release-and-distribution)
 * [DAG Deployment](#dag-deployment)
-* * [GCP](#gcp)
+* * [Google Cloud](#gc)
 * [Requirements](#requirements)
 * [Testing](#testing)
 * * [Registering a Workflow](#registering-a-workflow)
@@ -17,13 +17,13 @@
 Airflow DAG for transformation from SEGY to OpenVDS
 
 
-## GCP
+## Google Cloud
 The `dags/segy_to_vds_ssdms_conversion_dag.py` DAG stores output to Seismic DDMS.
 
 The `dags/segy_to_vds_conversion_dag.py` DAG stores output to GCS bucket.
 
 # DAG File Compilation
-## GCP
+## Google Cloud
 The `dags/segy_to_vds_ssdms_conversion_dag.py` DAG file contains a number of placeholders `{| |}`, specifying to put proper values there, e.g.
 
 ```python 
@@ -38,12 +38,12 @@ To bootstrap the DAG file cloud providers provide their specific `bootstrap` [sc
 
 # DAG Release and Distribution
 
-## GCP
-GCP DAG version is distributed as a generic package. During OSDU release the bootstrapped DAG file is published to the [Gitlab Generic Registy](https://community.opengroup.org/help/user/packages/generic_packages/index.md#publish-a-generic-package-by-using-cicd).
+## Google Cloud
+Google Cloud DAG version is distributed as a generic package. During OSDU release the bootstrapped DAG file is published to the [Gitlab Generic Registy](https://community.opengroup.org/help/user/packages/generic_packages/index.md#publish-a-generic-package-by-using-cicd).
 
 # DAG Deployment
-## GCP
-For GCP, the bootstrapped DAG only uses Airflow variables to populate these values at runtime.
+## Google Cloud
+For Google Cloud, the bootstrapped DAG only uses Airflow variables to populate these values at runtime.
 
 Before deploying this DAG, make sure the following Airlfow variables are set:
 

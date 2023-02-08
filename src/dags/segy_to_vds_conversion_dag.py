@@ -20,7 +20,7 @@ from datetime import timedelta
 import airflow
 from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
-from operators.gcp.kubernetes_pod_with_auth import \
+from operators.gc.kubernetes_pod_with_auth import \
     KubernetesPodOperatorWithAuth
 
 default_args = {
