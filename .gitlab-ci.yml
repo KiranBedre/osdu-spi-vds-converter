@@ -25,7 +25,7 @@ variables:
   # AWS env vars
   AWS_DEPLOY_TARGET: EKS
   # AWS collection vars
-  AWS_COLLECTION_PATH: https://community.opengroup.org/osdu/platform/testing/-/raw/master/Postman%20Collection/40_CICD_SEGY_OpenVDS_Conversion/SegyToOpenVDS%20conversion%20using%20Seisstore%20CI-CD%20v1.0.postman_collection.json
+  AWS_COLLECTION_PATH: https://community.opengroup.org/osdu/platform/testing/-/raw/master/Postman%20Collection/46_CICD_SEGY_OpenVDS_Conversion_ManualStorageRecordsCreation/SegyToOpenVDS%20conversion%20using%20Seisstore%20CI-CD%20v1.0.postman_collection.json
   AWS_COLLECTION_ENV_PATH: https://community.opengroup.org/osdu/platform/testing/-/raw/master/Postman%20Collection/00_CICD_Setup_Environment/aws.OSDU%20R3%20PROD%20v2.4.postman_environment.json
   AWS_COLLECTION_TEST_PATH: ""
   AWS_TEST_FILE_INPUT: ""
@@ -34,7 +34,7 @@ variables:
   SKIP_BOOTSTRAP: "true"
   SKIP_PUBLISH: "true"
   SKIP_END_TO_END: "false"
-  AWS_POSTMAN_TESTS_TO_SKIP: "3 Ingest Seismic|3.2 Check the triggered Ingestion workflow status|4.1 Unlock SEGY|4.4 Check the triggered OpenVDS workflow status|5 Validate Ingestion|6 Get VDS info|7 Clean-up"
+  AWS_POSTMAN_TESTS_TO_SKIP: ""
 image: google/cloud-sdk:alpine
 
 stages:
