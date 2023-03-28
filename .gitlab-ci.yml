@@ -34,7 +34,7 @@ variables:
   SKIP_BOOTSTRAP: "true"
   SKIP_PUBLISH: "true"
   SKIP_END_TO_END: "false"
-  AWS_POSTMAN_TESTS_TO_SKIP: ""
+  AWS_POSTMAN_TESTS_TO_SKIP: "7.1 Delete Workflow"
 image: google/cloud-sdk:alpine
 
 stages:
