@@ -13,8 +13,8 @@ variables:
 gc-render-dag:
   needs: []
 
-# Anthos
-gc-render-dag:anthos:
+# Baremetal
+gc-render-dag:baremetal:
   needs: []
 
 gc-deploy-dag:community:
@@ -22,7 +22,7 @@ gc-deploy-dag:community:
     # FIXME (GONRG-5847): an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
     GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest
 
-gc-deploy-dag:anthos:
+gc-deploy-dag:baremetal:
   variables:
     IMAGE_TAG_VARIABLE_NAME: anthos__image__segy_to_vds_converter
     # FIXME (GONRG-5847): an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
