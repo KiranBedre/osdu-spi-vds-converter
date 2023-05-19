@@ -1,4 +1,4 @@
-## ANTHOS: DAG FILE RENDERING
+## BAREMETAL: DAG FILE RENDERING
 
 ```bash
 # Install requirements
