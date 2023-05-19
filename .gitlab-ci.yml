@@ -25,7 +25,7 @@ variables:
   # AWS env vars
   AWS_DEPLOY_TARGET: EKS
   # AWS collection vars
-  AWS_COLLECTION_PATH: https://community.opengroup.org/osdu/qa/-/blob/main/Postman%20Collection/42_CICD_SEGY_ZGY_Conversion/SegyToZgyConversion%20Workflow%20using%20SeisStore%20R3%20CI-CD%20v1.0.postman_collection.json
+  AWS_COLLECTION_PATH: https://community.opengroup.org/osdu/qa/-/blob/main/Postman%20Collection/46_CICD_SEGY_OpenVDS_Conversion_ManualStorageRecordsCreation/SegyToOpenVDS%20conversion%20using%20Seisstore%20CI-CD%20v1.0.postman_collection.json
   AWS_COLLECTION_ENV_PATH: https://community.opengroup.org/osdu/qa/-/blob/main/Postman%20Collection/00_CICD_Setup_Environment/aws.OSDU%20R3%20PROD%20v2.4.postman_environment.json
   AWS_COLLECTION_TEST_PATH: ""
   AWS_TEST_FILE_INPUT: ""
