@@ -56,8 +56,7 @@ class DAGFileRenderer:
             rendered_file_data = self._render_template(f)
 
         rendered_file_data = DAGVersionGenerator(
-            rendered_file_data, 
-            f"{pathlib.Path(__file__).parent.resolve()}/VERSION"
+            rendered_file_data
         ).add_dag_version()
 
         with open(output_path, "w") as f:
