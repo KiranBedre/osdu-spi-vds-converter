@@ -18,16 +18,20 @@ class DAGFileRenderer:
         self.dag_name = "Segy_to_vds_conversion_sdms"
 
     def _get_resources(self):
-        return """{
-                "request_memory": airflow.models.Variable.get("anthos__vds_ingestion_request_memory", default_var="2Gi"),
-                "request_cpu": airflow.models.Variable.get("anthos__vds_ingestion_request_cpu", default_var="200m"),
-                "limit_memory": airflow.models.Variable.get("anthos__vds_ingestion_limit_memory", default_var="8Gi"),
-                "limit_cpu": airflow.models.Variable.get("anthos__vds_ingestion_limit_cpu", default_var="1000m")
-            }"""
+        return """k8s_models.V1ResourceRequirements(
+                limits={
+                    "memory": airflow.models.Variable.get("anthos__vds_ingestion_limit_memory", default_var="8Gi"),
+                    "cpu": airflow.models.Variable.get("anthos__vds_ingestion_limit_cpu", default_var="1000m")
+                },
+                requests={
+                    "memory": airflow.models.Variable.get("anthos__vds_ingestion_request_memory", default_var="2Gi"),
+                    "cpu": airflow.models.Variable.get("anthos__vds_ingestion_request_cpu", default_var="200m")
+                }
+            )"""
 
     def _prepare_operator_kwargs(self) -> Dict:
         return f"""{{
-            "resources": {self._get_resources()},
+            "container_resources": {self._get_resources()},
             "startup_timeout_seconds": 300, 
             "annotations": {{
                 "sidecar.istio.io/inject": "false"
@@ -38,6 +42,12 @@ class DAGFileRenderer:
         return """{
             "S3_ENDPOINT_OVERRIDE": "{{ var.value.core__service__minio__url }}"
         }"""
+
+    def _add_k8s_import(self, dag_file: str) -> str:
+        first_import_idx = dag_file.find("import airflow")
+        import_stmt = "\nfrom kubernetes.client import models as k8s_models\n"
+        dag_file = dag_file[:first_import_idx] + import_stmt + dag_file[first_import_idx:]
+        return dag_file
 
     def _render_template(self, file) -> str:
         env = Environment(
@@ -55,7 +65,10 @@ class DAGFileRenderer:
             "SEISMIC_STORE_URL": self.sd_svc_url,
         }
 
-        return template.render(**params)
+        rendered_file_data = template.render(**params)
+        rendered_file_data = self._add_k8s_import(rendered_file_data)
+
+        return rendered_file_data
 
     def render(self, output_path=None):
         print(f"Start {self.file_path} file rendering")
