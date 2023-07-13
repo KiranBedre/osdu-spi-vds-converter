@@ -12,6 +12,15 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+# Adding below source urls to see where the code is coming from in airflow dag's code page
+# Please change these lines if any dependencies are changed in future or if the code is moved
+# This code is coming from repo: https://community.opengroup.org/osdu/platform/data-flow/ingestion/segy-to-vds-conversion
+# File: https://community.opengroup.org/osdu/platform/data-flow/ingestion/segy-to-vds-conversion/-/blob/master/openvds.py
+# Dependencies: 
+# osdu-api==0.21.3
+# osdu-airflow==0.21.2
+# osdu-ingestion==0.21.0
+
 
 """DAG for transformation SEGY file stored Seismic Store to VDS files in Seismic Store."""
 
