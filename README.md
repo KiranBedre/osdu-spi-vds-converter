@@ -50,12 +50,11 @@ Before deploying this DAG, make sure the following Airlfow variables are set:
 | Name  | Default |Description |
 | ------------- |------------- | ------------- |
 | `core__service__seismic__url`| - | OSDU Seismic DDMS URL  |
-| `gcp__data_partition_id`| - | Data partition ID  |
-| `gcp__image__segy_to_vds_converter`| - | SEGY to VDS Converter Image  |
-| `gcp__vds_ingestion_request_memory`| 1Gi | Request Memory  |
-| `gcp__vds_ingestion_request_cpu`| 200m | Request CPU  |
-| `gcp__vds_ingestion_limit_memory`| 1Gi | Memory Limit  |
-| `gcp__vds_ingestion_limit_cpu`| 1000m | CPU Limit  |
+| `image__segy_to_vds_converter`| - | SEGY to VDS Converter Image  |
+| `vds__ingestion__request__memory`| 1Gi | Request Memory (optional) |
+| `vds__ingestion__request__cpu`| 200m | Request CPU  (optional)|
+| `vds__ingestion__limit__memory`| 1Gi | Memory Limit  (optional)|
+| `vds__ingestion__limit__cpu`| 1000m | CPU Limit  (optional)|
 
 **Note**: Environment variables can be used as well. Pelase see [Airflow Documnetation](https://airflow.apache.org/docs/apache-airflow/stable/howto/variable.html#storing-variables-in-environment-variables)
 

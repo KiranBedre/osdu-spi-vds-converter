@@ -10,7 +10,7 @@ class DAGFileRenderer:
 
     def __init__(self, file_path):
         self.file_path = file_path
-        self.docker_image = "{{ var.value.anthos__image__segy_to_vds_converter }}"
+        self.docker_image = "{{ var.value.image__segy_to_vds_converter }}"
         # As for 25 FEB 2022, there is no namespace parameter in template_fields (https://github.com/apache/airflow/blob/2.2.0/airflow/providers/cncf/kubernetes/operators/kubernetes_pod.py#L165), 
         # so we have to hardcode this value for now.
         self.namespace = "default"
@@ -20,12 +20,12 @@ class DAGFileRenderer:
     def _get_resources(self):
         return """k8s_models.V1ResourceRequirements(
                 limits={
-                    "memory": airflow.models.Variable.get("anthos__vds_ingestion_limit_memory", default_var="8Gi"),
-                    "cpu": airflow.models.Variable.get("anthos__vds_ingestion_limit_cpu", default_var="1000m")
+                    "memory": airflow.models.Variable.get("vds_ingestion__limit__memory", default_var="8Gi"),
+                    "cpu": airflow.models.Variable.get("vds_ingestion__limit__cpu", default_var="1000m")
                 },
                 requests={
-                    "memory": airflow.models.Variable.get("anthos__vds_ingestion_request_memory", default_var="2Gi"),
-                    "cpu": airflow.models.Variable.get("anthos__vds_ingestion_request_cpu", default_var="200m")
+                    "memory": airflow.models.Variable.get("vds_ingestion__request__memory", default_var="2Gi"),
+                    "cpu": airflow.models.Variable.get("vds_ingestion__request__cpu", default_var="200m")
                 }
             )"""
 

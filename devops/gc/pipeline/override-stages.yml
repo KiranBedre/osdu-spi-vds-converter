@@ -4,10 +4,10 @@ variables:
   GC_DAG_DIRECTORY: src/dags
   GC_DAG_FILE: segy_to_vds_ssdms_conversion_dag.py
   OUTPUT_FILE: $GC_RENDERED_DAG_FOLDER/$GC_DAG_FILE
-  IMAGE_TAG_VARIABLE_NAME: gcp__image__segy_to_vds_converter
+  IMAGE_TAG_VARIABLE_NAME: image__segy_to_vds_converter
   GC_GCR_REGISTRY: gcr.io/osdu-anthos
   # Postman tests
-  COLLECTION_PATH: "Postman%20Collection/40_CICD_SEGY_OpenVDS_Conversion/SegyToOpenVDS%20conversion%20using%20Seisstore%20CI-CD%20v1.0.postman_collection.json"
+  COLLECTION_PATH: "Postman%20Collection/40_CICD_SEGY_OpenVDS_Conversion/SegyToOpenVDS%20conversion%20using%20Seisstore%20CI-CD%20v1.0.postman_collection_NotRun.json?ref_type=heads&inline=false"
 
 # Community, Dev2, Preship
 gc-render-dag:
@@ -24,7 +24,7 @@ gc-deploy-dag:community:
 
 gc-deploy-dag:baremetal:
   variables:
-    IMAGE_TAG_VARIABLE_NAME: anthos__image__segy_to_vds_converter
+    IMAGE_TAG_VARIABLE_NAME: image__segy_to_vds_converter
     # FIXME (GONRG-5847): an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
     GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:latest
 
