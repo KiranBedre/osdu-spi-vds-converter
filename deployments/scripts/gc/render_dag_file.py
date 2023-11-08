@@ -18,16 +18,26 @@ class DAGFileRenderer:
         self.dag_name = "Segy_to_vds_conversion_sdms"
 
     def _get_resources(self):
-        return """{
-                "request_memory": airflow.models.Variable.get("vds__ingestion__request__memory", default_var="2Gi"),
-                "request_cpu": airflow.models.Variable.get("vds__ingestion__request__cpu", default_var="200m"),
-                "limit_memory": airflow.models.Variable.get("vds__ingestion__limit__memory", default_var="8Gi"),
-                "limit_cpu": airflow.models.Variable.get("vds__ingestion__limit__cpu", default_var="1000m")
-            }"""
+        return """k8s_models.V1ResourceRequirements(
+                limits={
+                    "memory": airflow.models.Variable.get("vds_ingestion__limit__memory", default_var="8Gi"),
+                    "cpu": airflow.models.Variable.get("vds_ingestion__limit__cpu", default_var="1000m")
+                },
+                requests={
+                    "memory": airflow.models.Variable.get("vds_ingestion__request__memory", default_var="2Gi"),
+                    "cpu": airflow.models.Variable.get("vds_ingestion__request__cpu", default_var="200m")
+                }
+            )"""
+
+    def _add_k8s_import(self, dag_file: str) -> str:
+        first_import_idx = dag_file.find("import airflow")
+        import_stmt = "\nfrom kubernetes.client import models as k8s_models\n"
+        dag_file = dag_file[:first_import_idx] + import_stmt + dag_file[first_import_idx:]
+        return dag_file
 
     def _prepare_operator_kwargs(self) -> Dict:
         return f"""{{
-            "resources": {self._get_resources()},
+            "container_resources": {self._get_resources()},
             "startup_timeout_seconds": 300
         }}"""
 
@@ -54,6 +64,7 @@ class DAGFileRenderer:
         output_path = output_path or self.file_path
         with open(self.file_path, "r") as f:
             rendered_file_data = self._render_template(f)
+            rendered_file_data = self._add_k8s_import(rendered_file_data)
 
         rendered_file_data = DAGVersionGenerator(
             rendered_file_data
