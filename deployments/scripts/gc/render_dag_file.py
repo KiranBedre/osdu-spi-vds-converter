@@ -38,6 +38,7 @@ class DAGFileRenderer:
     def _prepare_operator_kwargs(self) -> Dict:
         return f"""{{
             "container_resources": {self._get_resources()},
+            "config_file": "/home/airflow/composer_kube_config",
             "startup_timeout_seconds": 300
         }}"""
 
