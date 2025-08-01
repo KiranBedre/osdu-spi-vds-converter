@@ -17,15 +17,15 @@ gc-render-dag:
 gc-deploy-dag:community:
   variables:
     # FIXME (GONRG-5847): an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
-    GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:3.4.5
+    GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:3.4.6
 
 
 gc-deploy-dag:dev2:
   variables:
     # FIXME (GONRG-5847): an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
-    GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:3.4.5
+    GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:3.4.6
 
 gc-deploy-dag:preship:
   variables:
     # FIXME (GONRG-5847): an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image in composer with sha/latest/release/tag versions
-    GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:3.4.5
+    GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:3.4.6
