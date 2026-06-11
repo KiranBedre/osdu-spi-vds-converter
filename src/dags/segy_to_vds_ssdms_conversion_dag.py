@@ -126,8 +126,12 @@ def pre_conversion(params = None):
         f'--url-connection', f'{sdtoken}',
         f'--persistentID', f'{persistent_id}',
         f'--input-connection', sdtoken,
-        f"{segy_url}"
     ]
+
+    extra_arguments = execution_context.get('segyimport_arguments', [])
+    if extra_arguments:
+        logger.info(f"Adding additional SEGYImport arguments: {extra_arguments}")
+        arguments.extend(extra_arguments)
 
     if ovds_segy_headers:
         headers_str = []
@@ -137,6 +141,8 @@ def pre_conversion(params = None):
         headers_override_message = ",\n".join(headers_str)
         logger.info("The following header-field locations are going to be overwritten:")
         logger.info(headers_override_message)
+
+    arguments.append(f"{segy_url}")
         
     return {
         'arguments': arguments,
