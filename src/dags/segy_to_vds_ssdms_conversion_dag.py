@@ -18,7 +18,7 @@
 # File: https://community.opengroup.org/osdu/platform/data-flow/ingestion/segy-to-vds-conversion/-/blob/master/openvds.py
 # Dependencies: 
 # osdu-api==0.28.0
-# osdu-airflow==0.28.0
+# osdu-airflow~=0.30.0
 # osdu-ingestion==0.28.0
 
 
@@ -42,16 +42,23 @@ Run example from Workflow service
 from datetime import timedelta
 import logging
 
-## Not used but required for DAG rendering
-import airflow
-
 from airflow.decorators import dag, task
-from airflow.utils.dates import days_ago
-from airflow.utils.log.secrets_masker import mask_secret
-from airflow.utils.trigger_rule import TriggerRule
-
 from airflow.models import Variable
-from airflow.providers.cncf.kubernetes.operators.pod import KubernetesPodOperator
+
+# Airflow 3 relocated mask_secret to airflow.sdk.log
+try:
+    from airflow.sdk.log import mask_secret
+except ImportError:
+    from airflow.utils.log.secrets_masker import mask_secret
+
+# Airflow 2/3 backward-compatibility adapter (osdu-airflow-lib)
+from osdu_airflow.backward_compatibility import (
+    get_dag_schedule_kwargs,
+    get_days_ago,
+    get_kubernetes_pod_operator,
+    get_trigger_rule,
+    update_default_args,
+)
 from osdu_airflow.operators.process_manifest_r3 import \
     ProcessManifestOperatorR3
 from osdu_airflow.operators.update_status import UpdateStatusOperator
@@ -63,12 +70,18 @@ from osdu_ingestion.libs.segy_conversion_metadata.open_vds import OpenVDSMetadat
 from osdu_ingestion.libs.segy_conversion_metadata.headers_byte_locations import (
     HeadersByteLocations, ovds_converter_byte_locations)
 
+# Resolve version-specific operator/date helpers via the compat adapter
+KubernetesPodOperator = get_kubernetes_pod_operator()
+days_ago = get_days_ago()
+
 default_args = {
     "start_date": days_ago(0),
     "retries": 0,
     "retry_delay": timedelta(seconds=30),
-    "trigger_rule": TriggerRule.NONE_FAILED_OR_SKIPPED,
+    "trigger_rule": get_trigger_rule("none_failed_or_skipped"),
 }
+
+default_args = update_default_args(default_args)
 
 dag_name = "{| DAG_NAME |}"
 docker_image = "{| DOCKER_IMAGE |}"
@@ -188,8 +201,8 @@ def post_conversion(persistent_id, vds_url, params = None):
     dag_name,
     default_args=default_args,
     description="Airflow DAG for transformation from SEGY to OpenVDS",
-    schedule_interval=None,
-    dagrun_timeout=timedelta(hours=24)
+    dagrun_timeout=timedelta(hours=24),
+    **get_dag_schedule_kwargs(schedule=None),
 )
 
 def segy_to_openvds():
@@ -220,7 +233,7 @@ def segy_to_openvds():
 
     update_status_finished = UpdateStatusOperator(
         task_id="update_status_finished",
-        trigger_rule=TriggerRule.ALL_DONE
+        trigger_rule=get_trigger_rule("all_done")
     )
 
     update_status_running >> pre_convert >> segy_to_vds >> post_convert >> process_single_manifest_file >> update_status_finished # pylint: disable=pointless-statement
