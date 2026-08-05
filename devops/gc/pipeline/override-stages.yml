@@ -6,19 +6,35 @@ variables:
   OUTPUT_FILE: $GC_RENDERED_DAG_FOLDER/$GC_DAG_FILE
   IMAGE_TAG_VARIABLE_NAME: image__segy_to_vds_converter
   GC_GCR_REGISTRY: gcr.io/osdu-anthos
+  OPENVDS_API: "https://community.opengroup.org/api/v4/projects/53"
+  OPENVDS_IMAGE_REPO: "community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion"
   # Postman tests
   COLLECTION_PATH: "Postman%20Collection/46_CICD_SEGY_OpenVDS_Conversion_ManualStorageRecordsCreation/SegyToOpenVDS%20conversion%20using%20Seisstore%20CI-CD%20v1.0.postman_collection.json"
+
+.resolve_openvds_image:
+  script:
+    - |
+      if [ -z "${OPENVDS_VERSION:-}" ]; then
+        OPENVDS_REPO_ID=$(curl -sSf "$OPENVDS_API/registry/repositories" \
+          | python3 -c "import sys, json; print(next(r['id'] for r in json.load(sys.stdin) if r['path'].endswith('/openvds-ingestion')))")
+        OPENVDS_VERSION=$(curl -sSf "$OPENVDS_API/registry/repositories/$OPENVDS_REPO_ID/tags?per_page=100" \
+          | python3 -c "import sys, json, re; t = [x['name'] for x in json.load(sys.stdin) if re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+', x['name'])]; print(max(t, key=lambda s: tuple(map(int, s.split('.')))))")
+      fi
+      if [ -z "$OPENVDS_VERSION" ]; then
+        echo "ERROR: unable to resolve an OpenVDS ingestion image version"
+        exit 1
+      fi
+      export GC_COMPOSER_TAG="$OPENVDS_IMAGE_REPO:$OPENVDS_VERSION"
+      echo "Resolved OpenVDS ingestion image: $GC_COMPOSER_TAG"
 
 # Community, Preship
 gc-render-dag:
   needs: []
 
 gc-deploy-dag:community:
-  variables:
-    # FIXME (GONRG-13184): an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image automatically
-    GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:3.4.9
+  before_script:
+    - !reference [.resolve_openvds_image, script]
 
 gc-deploy-dag:preship:
-  variables:
-    # FIXME (GONRG-13184): an open-vds image is created in a different repo, need to implement a new logic on how to update the open-vds image automatically
-    GC_COMPOSER_TAG: community.opengroup.org:5555/osdu/platform/domain-data-mgmt-services/seismic/open-vds/openvds-ingestion:3.4.9
+  before_script:
+    - !reference [.resolve_openvds_image, script]
