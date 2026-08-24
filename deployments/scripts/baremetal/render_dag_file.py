@@ -44,6 +44,7 @@ class DAGFileRenderer:
         }"""
 
     def _add_k8s_import(self, dag_file: str) -> str:
+        dag_file = "import airflow\n" + dag_file
         first_import_idx = dag_file.find("import airflow")
         import_stmt = "\nfrom kubernetes.client import models as k8s_models\n"
         dag_file = dag_file[:first_import_idx] + import_stmt + dag_file[first_import_idx:]
