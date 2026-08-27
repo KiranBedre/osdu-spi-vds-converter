@@ -21,20 +21,6 @@ variables:
   AZURE_CLIENT_ID: ${AZURE_PRINCIPAL_ID}
   AZURE_CLIENT_SECRET: ${AZURE_PRINCIPAL_SECRET}
   AZURE_AD_APP_RESOURCE_ID: ${AZURE_APP_ID}
-
-  # AWS env vars
-  AWS_DEPLOY_TARGET: EKS
-  # AWS collection vars
-  AWS_COLLECTION_PATH: https://community.opengroup.org/osdu/qa/-/raw/main/Postman%20Collection/46_CICD_SEGY_OpenVDS_Conversion_ManualStorageRecordsCreation/SegyToOpenVDS%20conversion%20using%20Seisstore%20CI-CD%20v1.0.postman_collection.json
-  AWS_COLLECTION_ENV_PATH: https://community.opengroup.org/osdu/qa/-/raw/main/Postman%20Collection/00_CICD_Setup_Environment/aws.OSDU%20R3%20PROD%20v2.4.postman_environment.json
-  AWS_COLLECTION_TEST_PATH: ""
-  AWS_TEST_FILE_INPUT: ""
-  AWS_TEST_FILE_KEY: ""
-  #Skip stages Variables
-  SKIP_BOOTSTRAP: "true"
-  SKIP_PUBLISH: "true"
-  SKIP_END_TO_END: "false"
-  AWS_POSTMAN_TESTS_TO_SKIP: "7.1 Delete Workflow"
 image: google/cloud-sdk:alpine
 
 stages:
@@ -67,9 +53,3 @@ include:
   - local: "/devops/azure/override-stages.yml"
   - local: "/devops/gc/pipeline/override-stages.yml"
   - local: "/devops/ibm/ibm-stages.yml"
-
-  - project: "osdu/platform/ci-cd-pipelines"
-    file: "cloud-providers/aws-global-variables.yml"
-
-  - project: "osdu/platform/ci-cd-pipelines"
-    file: "cloud-providers/aws-dag.yml"
