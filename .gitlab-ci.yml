@@ -56,15 +56,12 @@ stages:
 
 include:
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: release/0.30
     file: "standard-setup.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: release/0.30
     file: "cloud-providers/gc-dag.yaml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: release/0.30
     file: "cloud-providers/azure_dag.yml"
 
   - local: "/devops/azure/override-stages.yml"
@@ -72,9 +69,7 @@ include:
   - local: "/devops/ibm/ibm-stages.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: release/0.30
     file: "cloud-providers/aws-global-variables.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: release/0.30
     file: "cloud-providers/aws-dag.yml"
