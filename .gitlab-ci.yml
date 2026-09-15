@@ -30,7 +30,6 @@ stages:
   - test
   - containerize
   - bootstrap_dag
-  - publish_dag
   - deploy
   - scan
   - bootstrap
@@ -45,11 +44,7 @@ include:
     file: "standard-setup.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    file: "cloud-providers/gc-dag.yaml"
-
-  - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/azure_dag.yml"
 
   - local: "/devops/azure/override-stages.yml"
-  - local: "/devops/gc/pipeline/override-stages.yml"
   - local: "/devops/ibm/ibm-stages.yml"

@@ -20,7 +20,6 @@ Airflow DAG for transformation from SEGY to OpenVDS
 ## Google Cloud
 The `dags/segy_to_vds_ssdms_conversion_dag.py` DAG stores output to Seismic DDMS.
 
-The `dags/segy_to_vds_conversion_dag.py` DAG stores output to GCS bucket.
 
 # DAG File Compilation
 ## Google Cloud
@@ -229,4 +228,4 @@ airflow.exceptions.AirflowException: Pod Launching failed: Pod returned a failur
 ```
 
 ## End-to-End Testing
-Deployed `dags/segy_to_vds_ssdms_conversion_dag.py` and `dags/segy_to_vds_conversion_dag.py` DAGs functionality can be tested by [e2e testing collection](https://community.opengroup.org/osdu/platform/testing/-/tree/master/Dev/27_CICD_Setup_SeismicDMSAPI).
+Deployed `dags/segy_to_vds_ssdms_conversion_dag.py` DAG functionality can be tested by [e2e testing collection](https://community.opengroup.org/osdu/platform/testing/-/tree/master/Dev/27_CICD_Setup_SeismicDMSAPI).
