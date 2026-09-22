@@ -1,7 +1,7 @@
 # These packages need to be installed in AF Env.
 
 --extra-index-url https://community.opengroup.org/api/v4/projects/148/packages/pypi/simple
-osdu-api==0.28.0
+osdu-api~=1.2.0
 
 --extra-index-url https://community.opengroup.org/api/v4/projects/668/packages/pypi/simple/
 osdu-airflow~=0.30.0
