@@ -1,0 +1,56 @@
+--- 
+.azure_variables: 
+  variables: 
+    AZURE_AD_APP_RESOURCE_ID: $AZURE_APP_ID
+    AZURE_AD_TENANT_ID: $AZURE_TENANT_ID
+    AZURE_CLIENT_ID: $AZURE_PRINCIPAL_ID
+    AZURE_CLIENT_SECRET: $AZURE_PRINCIPAL_SECRET
+    DATA_PARTITION_ID: opendes
+    SHARED_TENANT: opendes
+    WORKFLOW_URL: "https://${AZURE_DNS_NAME}/api/workflow/v1/"
+
+azure_standalone_tests:
+  stage: test
+  needs: []
+  variables:
+    AZURE_SKIP_STANDALONE_TESTS: "true"
+
+azure_build_dag:
+  needs: []
+  before_script:
+    - |
+      # Generating environment file to be passed while running the docker container
+      cat > .env << EOF
+      CI_REGISTRY_USER=${CI_REGISTRY_USER}
+      CI_REGISTRY_PASSWORD=${CI_REGISTRY_PASSWORD}
+      CI_REGISTRY=${CI_REGISTRY}
+      AZURE_DNS_NAME=$AZURE_DNS_NAME
+      AZURE_REGISTRY=${AZURE_REGISTRY}
+      AZURE_PRINCIPAL_ID=${AZURE_PRINCIPAL_ID}
+      AZURE_PRINCIPAL_SECRET=${AZURE_PRINCIPAL_SECRET}
+      AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      CI_PROJECT_NAME=${CI_PROJECT_NAME}
+      CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG}
+      CI_COMMIT_SHA=${CI_COMMIT_SHA}
+      CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE}
+      AZURE_DEPLOYMENTS_SCRIPTS_SUBDIR=${AZURE_DEPLOYMENTS_SCRIPTS_SUBDIR}
+      DAG_TASK_IMAGE=${DAG_TASK_IMAGE}
+      EOF
+
+
+azure_dag_postman_tests:
+  before_script:
+    - |
+      # Generating environment file to be passed while running the postman tests
+      cat > python_env_vars.txt << EOF
+      TENANT_ID os.environ.get('AZURE_TENANT_ID')
+      CLIENT_ID os.environ.get('CLIENT_ID')
+      CLIENT_SECRET os.environ.get('CLIENT_SECRET')
+      HOSTNAME os.environ.get('AZURE_DNS_NAME')
+      refresh_token os.environ.get('AZURE_REFRESH_TOKEN')
+      WORKFLOW_HOST os.environ.get('AZURE_DNS_NAME')
+      segy_to_vds_ssdms_DAG_name os.environ.get('DAG_NAME')
+      EOF
+    - |
+      export BUILD_VERSION=$(echo ${CI_COMMIT_SHA} | cut -c -5)
+      export DAG_NAME="segy-to-vds-conversion"

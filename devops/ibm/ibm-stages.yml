@@ -1,0 +1,61 @@
+ibm_deploy:
+  image: openshift/origin-cli
+  tags: ['osdu-medium']
+  stage: deploy
+  variables:
+    IBM_DEPLOY_DIR: ibm_deploy_dir
+    IBM_OPENSHIFT_PROJECT: osdu-airflow
+    IBM_OPENSHIFT_PRESHIP_PROJECT: osdu-airflow
+    IBM_OPENSHIFT_DEVPRI_PROJECT: osdu-airflow
+  before_script:
+    - mkdir -p "$IBM_DEPLOY_DIR"
+    - oc login --token=$IBM_OPENSHIFT_AIRFLOW_TOKEN --server=$IBM_OPENSHIFT_URL
+  script:
+    - oc project $IBM_OPENSHIFT_PROJECT
+    - airflowWebPod=`oc get pods -n osdu-airflow | grep airflow-web* | awk '{ print $1 }'`
+    - echo $airflowWebPod
+    - oc cp src/dags/segy_to_vds_ssdms_conversion_dag_ibm.py $airflowWebPod:/opt/airflow/dags/repo -c airflow-web
+
+
+ibm-helm-charts-master:
+  stage: build
+  tags: ["osdu-small"]
+  image:
+    name: alpine/helm:3.6.3
+    entrypoint: [""]
+  before_script:
+    - cp src/dags/segy_to_vds_ssdms_conversion_dag.py devops/ibm/ibm-vds-dag/files/.
+    - helm plugin install https://github.com/chartmuseum/helm-push.git
+  script:
+    - helm cm-push ${IBM_HELM_DAG_PATH} ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/stable --username gitlab-ci-token --password $CI_JOB_TOKEN  
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+
+ibm_bootstrap:
+  image: openshift/origin-cli
+  tags: ['osdu-medium']
+  stage: bootstrap_dag
+  variables:
+    IBM_DEPLOY_DIR: ibm_deploy_dir
+    IBM_OPENSHIFT_PROJECT: osdu-airflow
+    IBM_OPENSHIFT_PRESHIP_PROJECT: osdu-airflow
+    IBM_OPENSHIFT_DEVPRI_PROJECT: osdu-airflow
+  before_script:
+    - mkdir -p "$IBM_DEPLOY_DIR"
+    - oc login --token=$IBM_OPENSHIFT_AIRFLOW_TOKEN --server=$IBM_OPENSHIFT_URL
+  script:
+    - oc project $IBM_OPENSHIFT_PROJECT
+    - airflowWebPod=`oc get pods -n osdu-airflow | grep airflow-web* | awk '{ print $1 }'`
+    - echo $airflowWebPod
+    - oc cp devops/ibm/sgy_to_vds.json $airflowWebPod:/opt/airflow/dags/repo -c airflow-web
+    - oc exec $airflowWebPod -c airflow-web -- sh -c "airflow variables import /opt/airflow/dags/repo/sgy_to_vds.json"
+ 
+ibm_integration_tests:
+  image: 
+    name: postman/newman:alpine
+    entrypoint: [""]
+  stage: integration
+  needs: [ibm_deploy]
+  script:
+    - newman --version
+    - newman run ./tests/e2e/ibm/IBM_OVDS_Conversion_Collection.postman_collection.json -e ./tests/e2e/ibm/IBM_OVDS_Conversion_Environment.postman_environment.json

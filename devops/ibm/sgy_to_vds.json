@@ -1,0 +1,9 @@
+{
+        "sgy_to_vds_env_var": {
+                "IBM_COS_URL":"minio-osdu-minio.odi-osdu-og-fa7661852f2ab29a6be32f560b2f5573-0000.us-south.containers.appdomain.cloud",
+				"SD_SVC_URL": "http://seismic-store-service.osdu.svc.cluster.local:5000/api/v3",
+				"SD_SVC_API_KEY": "test",
+				"SDAPI_LOGLEVEL" : "2"
+				
+        }
+}
