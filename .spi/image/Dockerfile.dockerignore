@@ -1,0 +1,9 @@
+*
+!requirements.txt
+!src/
+!src/dags/
+!src/dags/segy_to_vds_ssdms_conversion_dag.py
+!.spi/
+!.spi/ci/
+!.spi/ci/spi_vds/
+!.spi/ci/spi_vds/**

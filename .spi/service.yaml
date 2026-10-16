@@ -1,0 +1,38 @@
+schemaVersion: 4
+service:
+  name: vds-converter
+  archetype: airflow-dag-azure
+  sourcePath: .spi/runtime
+  pythonVersion: "3.12"
+  airflowVersion: "3.2.2"
+  dagPath: .spi/generated/segy_to_vds_ssdms_conversion_dag.py
+  dagId: segy-to-vds-conversion
+  image:
+    context: .
+    dockerfile: .spi/image/Dockerfile
+tests:
+  acceptance:
+    type: script
+    path: .spi
+    entrypoint: acceptance/run.sh
+    arguments:
+      - "--workflow-url"
+      - "${WORKFLOW_URL}"
+      - "--partition"
+      - "${PARTITION}"
+      - "--token"
+      - "${TOKEN}"
+      - "--workflow-name"
+      - "${WORKFLOW_NAME}"
+      - "--report"
+      - "acceptance/results/workflow.xml"
+    reportPaths:
+      - acceptance/results/workflow.xml
+    dependencies:
+      - workflow
+    timeoutMinutes: 10
+    bindings:
+      WORKFLOW_URL: { source: gateway, suffix: /api/workflow/v1 }
+      PARTITION: { source: partition }
+      TOKEN: { source: token }
+      WORKFLOW_NAME: { source: static, value: segy-to-vds-conversion }
