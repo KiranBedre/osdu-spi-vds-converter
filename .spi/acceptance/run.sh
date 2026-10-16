@@ -2,7 +2,6 @@
 
 set -eu
 
-spi_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-export PYTHONPATH="$spi_root/ci${PYTHONPATH:+:$PYTHONPATH}"
+acceptance_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 
-exec python3 -m spi_vds.workflow_smoke "$@"
+exec node "$acceptance_dir/workflow-smoke.mjs" "$@"

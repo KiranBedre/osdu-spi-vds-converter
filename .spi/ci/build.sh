@@ -12,6 +12,7 @@ python -m spi_vds.render_dag \
   --output .spi/generated/segy_to_vds_ssdms_conversion_dag.py
 
 python -m ruff check --line-length 100 .spi/ci/spi_vds .spi/tests
+node --test .spi/tests/*.test.mjs
 python -m pytest .spi/tests \
   --junitxml "$SPI_TEST_REPORT" \
   --cov spi_vds \
