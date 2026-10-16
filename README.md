@@ -1,117 +1,90 @@
-# OSDU <Service> Service for Azure
+# OSDU SEG-Y to OpenVDS Conversion DAG for Azure
 
-[![Release](https://img.shields.io/github/v/release/Azure/osdu-spi-<service>)](https://github.com/Azure/osdu-spi-<service>/releases)
-[![Validate](https://github.com/Azure/osdu-spi-<service>/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/Azure/osdu-spi-<service>/actions/workflows/validate.yml)
+[![Validate](https://github.com/KiranBedre/osdu-spi-vds-converter/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/KiranBedre/osdu-spi-vds-converter/actions/workflows/validate.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-> [!NOTE]
-> Shared service code comes from the [OSDU community upstream](<upstream-url>); the [OSDU documentation](<docs-url>) covers the API.
-
-<One or two sentences: what the service does for a caller. No implementation detail.>
+This repository packages the community
+[SEG-Y to OpenVDS conversion DAG](https://community.opengroup.org/osdu/platform/data-flow/ingestion/segy-to-vds-conversion)
+for the Azure-native OSDU SPI Stack. The DAG reads SEG-Y metadata from OSDU,
+launches `SEGYImport` in a Workload Identity-enabled Kubernetes pod, and writes
+the OpenVDS metadata back through OSDU services.
 
 ## At a glance
 
 | | |
 |---|---|
-| API base path | `<api-base-path>`, for example `/api/legal/v1/` |
-| Swagger UI | `<api-base-path>swagger` |
-| Health | `:<management-port>/actuator/health` |
-| Depends on | <Partition, Entitlements, ...> |
-| Azure resources | <Cosmos DB, Storage, Service Bus, Redis, Key Vault, ...> |
-| Deployed by | [OSDU SPI Stack](https://github.com/Azure/osdu-spi-stack) (`software/stacks/osdu/services/<service>.yaml`) |
+| Airflow DAG ID | `segy-to-vds-conversion` |
+| Airflow runtime | Airflow 3.2.2 on Python 3.12 |
+| Conversion runtime | OpenVDS `SEGYImport`, pinned separately by SPI Stack |
+| Depends on | Airflow, Workflow, Seismic Store, Storage, Search, Schema, Dataset, Partition |
+| Azure authentication | AKS Workload Identity through `airflow-identity-sa` |
+| Deployed by | [OSDU SPI Stack](https://github.com/Azure/osdu-spi-stack) |
 
 ## Repository layout
 
-[CONTRIBUTING.md](CONTRIBUTING.md) explains where each kind of change belongs.
+[CONTRIBUTING.md](CONTRIBUTING.md) explains the fork ownership model.
 
 | Path | Owner | Contents |
 |---|---|---|
-| `<service>-core/` | OSDU upstream | Shared service code |
-| `provider/<service>-azure/` | This repository | Azure provider |
-| `<service>-acceptance-test/` | OSDU upstream | End-to-end suite run against a deployed environment |
-| `testing/<service>-test-azure/` | This repository | Legacy Azure integration tests |
-| `.spi/service.yaml` | This repository | How CI deploys and tests the service on SPI Stack |
+| `src/`, `openvds.py`, `requirements.txt` | OSDU upstream | Community DAG source and runtime dependencies |
+| `.spi/` | This repository | Azure rendering, pinned runtime, image, tests, and service descriptor |
+| `.github/` and `build/` | SPI template | Shared repository automation |
 
-## Build
+The upstream DAG remains unchanged. `.spi/ci/spi_vds/render_dag.py` resolves its
+deployment placeholders for SPI so future upstream syncs remain reviewable.
 
-Requires Java 17 and Maven 3.6.3+. OSDU dependencies resolve from the public community registry through the settings file in `.mvn`:
+## Build and test
+
+CI installs the exact Airflow release under the official Python 3.12
+constraints, renders the DAG, runs the fork-owned unit tests with at least 90%
+coverage, and parses the result with Airflow's `DagBag`.
 
 ```bash
-mvn --settings .mvn/community-maven.settings.xml -P core,azure clean install
+uv venv --python 3.12 .venv
+uv pip install --python .venv/bin/python \
+  "apache-airflow==3.2.2" \
+  --constraint https://raw.githubusercontent.com/apache/airflow/constraints-3.2.2/constraints-3.12.txt
+uv pip install --python .venv/bin/python \
+  --requirement .spi/runtime/requirements.txt \
+  --requirement .spi/runtime/requirements-tests.in \
+  --constraint https://raw.githubusercontent.com/apache/airflow/constraints-3.2.2/constraints-3.12.txt
+PATH="$PWD/.venv/bin:$PATH" \
+SPI_TEST_REPORT=.spi/results/test-results.xml \
+SPI_COVERAGE_FILE=.spi/results/coverage.xml \
+  .spi/ci/build.sh
 ```
 
-The runnable jar lands at `provider/<service>-azure/target/<artifact>-*-spring-boot.jar`.
+The runtime image is built from
+`apache/airflow:3.2.2-python3.12@sha256:bbe58e3204d550ab98dbf738a42c0e6663c455357ecd0e2d1440ef9cb6a75f00`.
+It contains the rendered DAG and the exact OSDU Python dependencies declared
+in `.spi/runtime/requirements.txt`. `osdu-airflow` is pinned to 0.30.7 because
+0.30.8 raises its Airflow 3 minimum to 3.3.0. The OpenVDS conversion image is a
+separate required companion image.
 
-## Configuration
+## Runtime contract
 
-SPI Stack sets the service's environment from two places: the shared `osdu-config` ConfigMap and the service's own entry in [`services/<service>.yaml`](https://github.com/Azure/osdu-spi-stack/blob/main/software/stacks/osdu/services/<service>.yaml). Those files are the contract; the tables below list what <Service> actually reads from them.
-
-<List only variables the provider reads: trace each through `provider/<service>-azure/src/main/resources/application.properties`, and confirm values against a running deployment.>
-
-**Shared, from `osdu-config`:**
+SPI Stack supplies these Airflow Variables:
 
 | Variable | Purpose |
 |---|---|
-| `AZURE_TENANT_ID` | Entra tenant |
-| `AAD_CLIENT_ID` | Application ID that caller tokens are issued for |
-| `KEYVAULT_URI` | Central Key Vault |
-| <...> | |
+| `openvds_ingestion_image` | Immutable OpenVDS companion image reference |
+| `core__service__seismic__url` | In-cluster Seismic Store V3 endpoint |
 
-**Specific to <Service>**, from `services/<service>.yaml`:
+The conversion pod runs in the `airflow` namespace with service account
+`airflow-identity-sa` and label `azure.workload.identity/use=true`. The Azure
+Workload Identity webhook injects its client ID and federated token. No client
+secret is stored in the DAG or passed through Airflow Variables.
 
-| Variable and value on SPI Stack | Purpose |
-|---|---|
-| `SERVER_SERVLET_CONTEXTPATH`<br>`<api-base-path>` | API base path |
-| `AZURE_ISTIOAUTH_ENABLED`<br>`true` | Trust the mesh's token validation |
-| `AZURE_PAAS_WORKLOADIDENTITY_ISENABLED`<br>`true` | Authenticate to Azure with workload identity |
-| `PARTITION_SERVICE_ENDPOINT`<br>`http://partition/api/partition/v1` | Per-partition resource lookup |
-| <...><br> |  |
+## Acceptance
 
-The service authenticates to Azure with workload identity, which injects `AZURE_CLIENT_ID` and a federated token; there are no client secrets. Per-partition resources are resolved at request time through the Partition service.
-
-## Test
-
-| Suite | Where | Runs in CI | Run it yourself |
-|---|---|---|---|
-| Unit | `<service>-core`, `provider/<service>-azure` | Pull requests (Java Build) | `mvn ... install` from [Build](#build) |
-| Acceptance | [`<service>-acceptance-test`](<service>-acceptance-test/README.md) | Pull requests, against SPI Stack (Deploy and Test) | `spi test <service>` |
-| Integration | `testing/<service>-test-azure` | <Yes / No> | <How, or why not> |
-
-CI runs these on pull requests from this repository that change code. Documentation-only changes skip the build, and pull requests from forks build without deploying.
-
-**Acceptance** proves a change on real infrastructure before it merges. It calls the deployed service through the gateway as a privileged test identity, and the bindings in `.spi/service.yaml` supply its inputs. Against an environment you are connected to:
-
-```bash
-spi test <service>                   # the image and suite the environment is running
-spi test <service> --source .        # this checkout's suite and descriptor
-```
-
-**Integration** <state whether it runs against SPI Stack, and if not, what it needs that the stack does not issue.>
-
-To call the API by hand, `spi token` mints a bearer token:
-
-```bash
-curl -H "Authorization: Bearer $(spi token)" -H "data-partition-id: <partition>" \
-  https://<gateway><api-base-path><endpoint>
-```
-
-## Deploy
-
-For a pull request from this repository that changes code, CI publishes the service image and its test suite image, `osdu-spi-<service>-acceptance`, to GHCR, and the Deploy and Test lane borrows an SPI Stack environment, runs the new image there, proves it with the acceptance suite, and restores the environment's own image. When that lane runs and passes, the change is proven on real infrastructure before it merges; the Validation Summary on the pull request shows whether it ran. This repository does not own infrastructure; SPI Stack does.
-
-To try a build by hand on an environment you are connected to, pin it by digest and release the pin when done:
-
-```bash
-spi service pin <service> --image ghcr.io/azure/osdu-spi-<service>@sha256:<digest>
-spi service reset <service>
-```
-
-## Service notes
-
-<Optional. Azure-specific behavior a reader needs that the upstream docs do not cover: reserved names, data model, feature flags the stack overrides and why. Delete the section if there is nothing.>
+The source acceptance suite verifies that Workflow service can resolve the
+`segy-to-vds-conversion` registration through the gateway. SPI Stack owns the
+deployment-level conversion proof because it must pin the DAG and OpenVDS
+images together, load the approved SEG-Y sample, and clean up the resulting
+records and objects.
 
 ## License
 
-Copyright © Microsoft Corporation
+Copyright Microsoft Corporation
 
 Licensed under the [Apache License 2.0](LICENSE).
