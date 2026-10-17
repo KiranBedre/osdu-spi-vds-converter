@@ -17,8 +17,9 @@ def test_render_upstream_dag(tmp_path: Path) -> None:
     rendered = output.read_text(encoding="utf-8")
     assert 'dag_name = "segy-to-vds-conversion"' in rendered
     assert "{{ var.value.openvds_ingestion_image }}" in rendered
+    assert 'k8s_namespace = "platform"' in rendered
     assert '"azure.workload.identity/use": "true"' in rendered
-    assert '"service_account_name": "airflow-identity-sa"' in rendered
+    assert '"service_account_name": "workload-identity-sa"' in rendered
     assert "AZURE_CLIENT_SECRET" not in rendered
     assert "{|" not in rendered
 

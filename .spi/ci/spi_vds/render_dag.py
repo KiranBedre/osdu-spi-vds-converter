@@ -6,11 +6,11 @@ import re
 REPLACEMENTS = {
     "{| DAG_NAME |}": "segy-to-vds-conversion",
     "{| DOCKER_IMAGE |}": "{{ var.value.openvds_ingestion_image }}",
-    "{| K8S_NAMESPACE |}": "airflow",
+    "{| K8S_NAMESPACE |}": "platform",
     "{| K8S_POD_KWARGS |}": """{
     "annotations": {"sidecar.istio.io/inject": "false"},
     "labels": {"azure.workload.identity/use": "true"},
-    "service_account_name": "airflow-identity-sa",
+    "service_account_name": "workload-identity-sa",
     "startup_timeout_seconds": 300,
 }""",
     "{| SEISMIC_STORE_URL |}": "{{ var.value.core__service__seismic__url }}",

@@ -17,7 +17,7 @@ the OpenVDS metadata back through OSDU services.
 | Airflow runtime | Airflow 3.2.2 on Python 3.12 |
 | Conversion runtime | OpenVDS `SEGYImport`, pinned separately by SPI Stack |
 | Depends on | Airflow, Workflow, Seismic Store, Storage, Search, Schema, Dataset, Partition |
-| Azure authentication | AKS Workload Identity through `airflow-identity-sa` |
+| Azure authentication | AKS Workload Identity through `platform:workload-identity-sa` |
 | Deployed by | [OSDU SPI Stack](https://github.com/Azure/osdu-spi-stack) |
 
 ## Repository layout
@@ -70,8 +70,8 @@ SPI Stack supplies these Airflow Variables:
 | `openvds_ingestion_image` | Immutable OpenVDS companion image reference |
 | `core__service__seismic__url` | In-cluster Seismic Store V3 endpoint |
 
-The conversion pod runs in the `airflow` namespace with service account
-`airflow-identity-sa` and label `azure.workload.identity/use=true`. The Azure
+The conversion pod runs in the `platform` namespace with service account
+`workload-identity-sa` and label `azure.workload.identity/use=true`. The Azure
 Workload Identity webhook injects its client ID and federated token. No client
 secret is stored in the DAG or passed through Airflow Variables.
 
