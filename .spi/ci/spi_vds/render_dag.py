@@ -11,10 +11,38 @@ REPLACEMENTS = {
     "annotations": {"sidecar.istio.io/inject": "false"},
     "labels": {"azure.workload.identity/use": "true"},
     "service_account_name": "workload-identity-sa",
+    "node_selector": {"spi-pool": "osdu"},
+    "tolerations": [
+        k8s.V1Toleration(
+            key="workload", operator="Equal", value="osdu", effect="NoSchedule"
+        ),
+        k8s.V1Toleration(
+            key="kubernetes.azure.com/scalesetpriority",
+            operator="Equal",
+            value="spot",
+            effect="NoSchedule",
+        ),
+    ],
+    "security_context": k8s.V1PodSecurityContext(
+        run_as_non_root=True,
+        seccomp_profile=k8s.V1SeccompProfile(type="RuntimeDefault"),
+    ),
+    "container_security_context": k8s.V1SecurityContext(
+        allow_privilege_escalation=False,
+        capabilities=k8s.V1Capabilities(drop=["ALL"]),
+    ),
+    "container_resources": k8s.V1ResourceRequirements(
+        requests={"cpu": "500m", "memory": "1Gi"},
+        limits={"cpu": "2", "memory": "4Gi"},
+    ),
     "startup_timeout_seconds": 300,
 }""",
     "{| SEISMIC_STORE_URL |}": "{{ var.value.core__service__seismic__url }}",
     "{| EXTRA_ENV_VARS|default('{}') |}": "{}",
+    "from airflow.models import Variable": (
+        "from airflow.models import Variable\n"
+        "from kubernetes.client import models as k8s"
+    ),
 }
 UNRESOLVED_TOKEN = re.compile(r"\{\|.*?\|\}")
 

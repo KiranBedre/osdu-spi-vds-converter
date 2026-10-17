@@ -20,6 +20,13 @@ def test_render_upstream_dag(tmp_path: Path) -> None:
     assert 'k8s_namespace = "platform"' in rendered
     assert '"azure.workload.identity/use": "true"' in rendered
     assert '"service_account_name": "workload-identity-sa"' in rendered
+    assert '"node_selector": {"spi-pool": "osdu"}' in rendered
+    assert "run_as_non_root=True" in rendered
+    assert 'k8s.V1SeccompProfile(type="RuntimeDefault")' in rendered
+    assert "allow_privilege_escalation=False" in rendered
+    assert 'k8s.V1Capabilities(drop=["ALL"])' in rendered
+    assert 'requests={"cpu": "500m", "memory": "1Gi"}' in rendered
+    assert 'limits={"cpu": "2", "memory": "4Gi"}' in rendered
     assert "AZURE_CLIENT_SECRET" not in rendered
     assert "{|" not in rendered
 

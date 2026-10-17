@@ -75,6 +75,11 @@ The conversion pod runs in the `platform` namespace with service account
 Workload Identity webhook injects its client ID and federated token. No client
 secret is stored in the DAG or passed through Airflow Variables.
 
+The pod selects the `osdu` node pool and tolerates its workload and spot
+taints. It requests 500m CPU and 1 GiB memory, with limits of 2 CPU and 4 GiB.
+The pod runs as non-root with RuntimeDefault seccomp; its container cannot
+escalate privileges and drops every Linux capability.
+
 ## Acceptance
 
 The source acceptance suite verifies that Workflow service can resolve the
