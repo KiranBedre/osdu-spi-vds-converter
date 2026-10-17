@@ -1,0 +1,92 @@
+# Per-service upstream filter config (ADR-038), planted at fork initialization
+# with segy-to-vds-conversion substituted from the upstream repository name.
+# Every upstream top-level entry, testing/ entry, root pom profile, and
+# .fossa.yml module must appear here: the engine halts rather than guess.
+# Entries absent from a given upstream tree are inert, so this file carries the
+# superset of the conventional OSDU service shape. A service that deviates
+# maintains its own copy of this file on the fork's main branch.
+service: segy-to-vds-conversion
+
+top_level:
+  .config: keep
+  .dockerignore: keep
+  .editorconfig: keep
+  .envrc.template: keep
+  .fossa.yml: keep
+  .gitattributes: keep
+  .gitignore: keep
+  .gitlab: strip
+  .gitlab-ci.yml: strip
+  .mvn: keep
+  .sonarlint: keep
+  .trufflehog-exclude: strip
+  LICENSE: keep
+  NOTICE: keep
+  README.md: strip
+  docs: keep
+  pom.xml: keep
+  publish.yml: strip
+  segy-to-vds-conversion-acceptance-test: keep
+  segy-to-vds-conversion-core: keep
+  segy-to-vds-conversion-core-plus: strip
+
+testing:
+  INTEGRATION-TESTS.md: keep
+  README.md: keep
+  maven: keep
+  pom.xml: keep
+  segy-to-vds-conversion-test-core: keep
+  segy-to-vds-conversion-test-azure: fork
+  segy-to-vds-conversion-test-aws: strip
+  segy-to-vds-conversion-test-baremetal: strip
+  segy-to-vds-conversion-test-core-plus: strip
+  segy-to-vds-conversion-test-gc: strip
+  segy-to-vds-conversion-test-gcp: strip
+  segy-to-vds-conversion-test-ibm: strip
+  segy-to-vds-conversion-test-jdbc: strip
+
+profiles:
+  Default: keep
+  core: keep
+  azure: inject
+  aws: strip
+  gc: strip
+  gcp: strip
+  ibm: strip
+
+fossa_modules:
+  segy-to-vds-conversion: keep
+  segy-to-vds-conversion-service: keep
+  segy-to-vds-conversion-core: keep
+  segy-to-vds-conversion-core-plus: strip
+  segy-to-vds-conversion-azure: strip
+  segy-to-vds-conversion-aws: strip
+  segy-to-vds-conversion-gc: strip
+  segy-to-vds-conversion-gcp: strip
+  segy-to-vds-conversion-ibm: strip
+  segy-to-vds-conversion-jdbc: strip
+
+expected_kept:
+  - pom.xml
+  - segy-to-vds-conversion-core
+  - testing/segy-to-vds-conversion-test-core
+
+expected_absent:
+  - provider
+  - devops
+  - segy-to-vds-conversion-core-plus
+  - .gitlab-ci.yml
+  - testing/segy-to-vds-conversion-test-azure
+  - testing/segy-to-vds-conversion-test-aws
+  - testing/segy-to-vds-conversion-test-core-plus
+
+inject_root_pom_azure_profile: |
+      <profile>
+        <id>azure</id>
+        <modules>
+          <module>provider/segy-to-vds-conversion-azure</module>
+        </modules>
+      </profile>
+
+inject_testing_pom_azure_module: |
+      <module>segy-to-vds-conversion-test-azure</module>
