@@ -27,7 +27,7 @@ the OpenVDS metadata back through OSDU services.
 | Path | Owner | Contents |
 |---|---|---|
 | `src/`, `openvds.py`, `requirements.txt` | OSDU upstream | Community DAG source and runtime dependencies |
-| `.spi/` | This repository | Azure rendering, pinned runtime, image, tests, and service descriptor |
+| `.spi/` | This repository | Azure rendering, DAG artifact, tests, and service descriptor |
 | `.github/` and `build/` | SPI template | Shared repository automation |
 
 The upstream DAG remains unchanged. `.spi/ci/spi_vds/render_dag.py` resolves its
@@ -37,7 +37,8 @@ deployment placeholders for SPI so future upstream syncs remain reviewable.
 
 CI installs the exact Airflow release under the official Python 3.12
 constraints, renders the DAG, runs the fork-owned unit tests with at least 90%
-coverage, and parses the result with Airflow's `DagBag`.
+coverage, parses the result with Airflow's `DagBag`, and builds the independently
+versioned DAG artifact.
 
 ```bash
 uv venv --python 3.12 .venv
@@ -54,12 +55,23 @@ SPI_COVERAGE_FILE=.spi/results/coverage.xml \
   .spi/ci/build.sh
 ```
 
-The runtime image is built from
-`apache/airflow:3.2.2-python3.12@sha256:bbe58e3204d550ab98dbf738a42c0e6663c455357ecd0e2d1440ef9cb6a75f00`.
-It contains the rendered DAG and the exact OSDU Python dependencies declared
-in `.spi/runtime/requirements.txt`. `osdu-airflow` is pinned to 0.30.7 because
-0.30.8 raises its Airflow 3 minimum to 3.3.0. The OpenVDS conversion image is a
-separate required companion image.
+The build image uses
+`apache/airflow:3.2.2-python3.12@sha256:bbe58e3204d550ab98dbf738a42c0e6663c455357ecd0e2d1440ef9cb6a75f00`
+to verify the rendered DAG against the exact dependencies in
+`.spi/runtime/requirements.txt`. `osdu-airflow` is pinned to 0.30.7 because
+0.30.8 raises its Airflow 3 minimum to 3.3.0.
+
+The Stack does not run that repository image. The shared Airflow runtime is
+released separately. This repository publishes
+`ghcr.io/kiranbedre/osdu-spi-vds-converter-dag` with:
+
+- `dag.zip`, the rendered `segy-to-vds-conversion` DAG.
+- `dag.zip.sha256`, the checksum verified before delivery.
+- `workflow.json`, the matching Workflow registration request body.
+
+The OpenVDS conversion image is also released separately and pinned through an
+Airflow Variable, so the DAG, task image, and Airflow control plane retain
+independent release boundaries.
 
 ## Runtime contract
 
