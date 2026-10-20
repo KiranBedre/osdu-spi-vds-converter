@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0](https://github.com/KiranBedre/osdu-spi-vds-converter/compare/v1.3.0...v1.4.0) (2026-10-20)
+
+
+### ✨ Features
+
+* Publish VDS DAG artifact ([#11](https://github.com/KiranBedre/osdu-spi-vds-converter/issues/11)) ([9e6609e](https://github.com/KiranBedre/osdu-spi-vds-converter/commit/9e6609e3949a88bdbe0bd0a13e2352e40f2cb404))
+
+
+### 🔧 Miscellaneous
+
+* **template-sync:** Sync template updates ([a2a7236](https://github.com/KiranBedre/osdu-spi-vds-converter/commit/a2a723689cace438c770bfbcb07bdfafcaa2f720))
+
 ## [1.3.0](https://github.com/KiranBedre/osdu-spi-vds-converter/compare/v1.2.0...v1.3.0) (2026-10-17)
 
 
