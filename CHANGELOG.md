@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.1](https://github.com/KiranBedre/osdu-spi-vds-converter/compare/v1.4.0...v1.4.1) (2026-10-23)
+
+
+### 🔧 Miscellaneous
+
+* Sync template updates ([#14](https://github.com/KiranBedre/osdu-spi-vds-converter/issues/14)) ([27ab43d](https://github.com/KiranBedre/osdu-spi-vds-converter/commit/27ab43ddca554fbb57c9875e7ff05d5ec194728b))
+* **template-sync:** Sync reconciled template ([01b0dbb](https://github.com/KiranBedre/osdu-spi-vds-converter/commit/01b0dbbf930125eef778684a1b8b1136abdd1be9))
+
 ## [1.4.0](https://github.com/KiranBedre/osdu-spi-vds-converter/compare/v1.3.0...v1.4.0) (2026-10-20)
 
 
