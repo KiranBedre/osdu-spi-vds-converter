@@ -15,7 +15,6 @@
 #  limitations under the License.
 
 variables:
-  IBM_HELM_DAG_PATH: devops/ibm/ibm-vds-dag
   AZURE_SERVICE: segy-to-vds-conversion
   AZURE_DEPLOYMENTS_SUBDIR: deployments/scripts/azure
   AZURE_CLIENT_ID: ${AZURE_PRINCIPAL_ID}
@@ -47,4 +46,3 @@ include:
     file: "cloud-providers/azure_dag.yml"
 
   - local: "/devops/azure/override-stages.yml"
-  - local: "/devops/ibm/ibm-stages.yml"
